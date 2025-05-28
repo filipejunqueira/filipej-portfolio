@@ -32,8 +32,12 @@ import {
   Sparkles,
   Loader2,
   AlertTriangle,
-  UserCircle,
+  UserCircle, // We might not need UserCircle anymore if replacing all placeholders
 } from "lucide-react";
+
+// Import your profile picture
+// Make sure the path is correct. If 'assets' is in 'src', this should work.
+import profilePic from "./assets/captainbroccoli.png";
 
 // --- Reusable Helper Components ---
 // Components are like custom HTML elements you can create and reuse.
@@ -301,10 +305,12 @@ const Navbar = ({ setActiveSection }) => {
           {/* 'h-16' sets a fixed height. */}
           {/* Left side of the navbar: Photo placeholder and Site Name/Brand */}
           <div className="flex items-center">
-            {/* Circular placeholder for a profile photo. TODO: Replace with an actual <img> tag. */}
-            <div className="w-10 h-10 bg-emerald-400 rounded-full flex items-center justify-center text-emerald-800 text-lg font-semibold mr-3 shadow-inner">
-              {/* You can put initials (e.g., "FJ") or an icon (<UserCircle />) here. */}
-            </div>
+            {/* MODIFIED: Replaced div with img tag for profile picture */}
+            <img
+              src={profilePic}
+              alt="Filipe L. Q. Junqueira"
+              className="w-10 h-10 rounded-full mr-3 object-cover shadow-inner"
+            />
             {/* Site name, links to the 'home' section. */}
             <a
               href="#home"
@@ -421,12 +427,12 @@ const HeroSection = () => (
     <div className="container mx-auto text-center px-6 flex flex-col items-center">
       {" "}
       {/* 'flex flex-col items-center' helps center the content vertically. */}
-      {/* Larger circular placeholder for a profile photo. TODO: Replace with an actual <img> tag. */}
-      <div className="w-32 h-32 md:w-40 md:h-40 bg-emerald-300 rounded-full flex items-center justify-center text-emerald-700 text-4xl font-semibold mb-6 shadow-lg border-4 border-white">
-        {/* You can put initials (e.g., "FJ") or an icon here. */}
-        <UserCircle size={80} className="text-emerald-500 opacity-70" />{" "}
-        {/* Example icon placeholder. */}
-      </div>
+      {/* MODIFIED: Replaced div with img tag for profile picture */}
+      <img
+        src={profilePic}
+        alt="Filipe L. Q. Junqueira profile"
+        className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover mb-6 shadow-lg border-4 border-white"
+      />
       {/* Your name, styled as a large heading. */}
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
         Filipe L. Q. Junqueira

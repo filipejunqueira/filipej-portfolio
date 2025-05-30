@@ -47,12 +47,6 @@ import {
   FileCode,
   Sun,
   Moon,
-  User,
-  MessageSquare, // Added User for About Me, MessageSquare for Languages
-  HardDrive, // For Computer Skills
-  Atom, // For Scientific Tools
-  Globe, // For Languages (alternative)
-  Lightbulb, // For Skills section main icon
 } from "lucide-react";
 
 import profilePic from "./assets/captainbroccoli.png";
@@ -126,21 +120,13 @@ const AnimatedSection = ({
 };
 
 // --- Reusable Helper Components ---
-const Section = ({
-  title,
-  icon: IconComponent,
-  children,
-  id,
-  titleClassName = "text-3xl sm:text-4xl",
-}) => (
+const Section = ({ title, icon: IconComponent, children, id }) => (
   <section
     id={id}
-    className="py-16 md:py-20 bg-white dark:bg-slate-800/80 rounded-xl shadow-xl dark:shadow-black/30 mb-12 md:mb-16 px-6 md:px-10"
+    className="py-16 md:py-20 bg-white dark:bg-slate-800/80 rounded-xl shadow-xl dark:shadow-black/20 mb-12 md:mb-16 px-6 md:px-10"
   >
     <div className="container mx-auto">
-      <h2
-        className={`${titleClassName} font-medium text-emerald-700 dark:text-emerald-400 mb-10 md:mb-14 text-center flex items-center justify-center`}
-      >
+      <h2 className="text-3xl sm:text-4xl font-medium text-emerald-700 dark:text-emerald-400 mb-10 md:mb-14 text-center flex items-center justify-center">
         {IconComponent && (
           <IconComponent
             className="w-8 h-8 sm:w-10 sm:h-10 mr-3 text-emerald-500 dark:text-emerald-400"
@@ -157,7 +143,6 @@ const Section = ({
 const ProjectCard = ({
   title,
   description,
-  artisticStatement,
   mainImage,
   galleryImages,
   imagePlaceholderColor,
@@ -191,7 +176,7 @@ const ProjectCard = ({
   };
 
   return (
-    <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
+    <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 transition-all duration-300 flex flex-col h-full">
       {type === "blender" && mainImage ? (
         <img
           src={mainImage}
@@ -215,24 +200,15 @@ const ProjectCard = ({
       </h3>
       <div className="flex-grow">
         <p
-          className={`text-gray-700 dark:text-slate-300 text-sm md:text-base mb-2 ${isDescriptionExpanded || !artisticStatement ? "" : "line-clamp-3"}`}
+          className={`text-gray-700 dark:text-slate-300 text-sm md:text-base mb-4 ${isDescriptionExpanded ? "" : "line-clamp-3"}`}
         >
           {description}
         </p>
-        {/* Display artistic statement if available */}
-        {artisticStatement && (
-          <p
-            className={`text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4 ${isDescriptionExpanded ? "" : "line-clamp-2"}`}
-          >
-            {artisticStatement}
-          </p>
-        )}
       </div>
-      {(description.length > 100 ||
-        (artisticStatement && artisticStatement.length > 50)) && (
+      {description.length > 100 && (
         <button
           onClick={toggleDescription}
-          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center mb-4 text-sm font-medium self-start uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center mb-4 text-sm font-medium self-start focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
         >
           {isDescriptionExpanded ? "Show Less" : "Show More"}
           {isDescriptionExpanded ? (
@@ -249,7 +225,7 @@ const ProjectCard = ({
           onToggleGallery && (
             <button
               onClick={onToggleGallery}
-              className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start mr-4 text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+              className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start mr-4 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
             >
               {isGalleryOpen ? "Hide Images" : "View Images"}
               {isGalleryOpen ? (
@@ -307,8 +283,6 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = [
     { id: "home", label: "Home" },
-    { id: "about", label: "About" },
-    { id: "skills", label: "Skills" },
     { id: "scientist", label: "Career & Education" },
     { id: "publications", label: "Publications" },
     { id: "blender", label: "Blender Art" },
@@ -531,154 +505,6 @@ const HeroSection = () => (
   </section>
 );
 
-// --- NEW AboutMeSection ---
-const AboutMeSection = () => {
-  const aboutMeNarrative = [
-    "Driven by an insatiable curiosity for the quantum realm and a passion for computational problem-solving, I thrive at the intersection of nanoscience, data science, and creative technology.",
-    "My journey has taken me from fundamental physics research and complex simulations to crafting intuitive command-line tools and exploring the artistic potential of 3D visualization.",
-    "I'm dedicated to leveraging cutting-edge techniques, including machine learning and advanced microscopy, to push the boundaries of what's possible at the atomic scale and to communicate these complex ideas effectively.",
-    "I'm always eager to connect with fellow innovators and explore opportunities where my diverse skill set can contribute to impactful projects and new discoveries.",
-  ];
-  return (
-    <Section
-      title="About Me"
-      icon={User}
-      id="about"
-      titleClassName="text-3xl sm:text-4xl md:text-5xl"
-    >
-      {" "}
-      {/* Slightly larger title for this section */}
-      <div className="max-w-3xl mx-auto space-y-5">
-        {aboutMeNarrative.map((paragraph, index) => (
-          <motion.p
-            key={index}
-            className="text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed text-center md:text-left"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-          >
-            {paragraph}
-          </motion.p>
-        ))}
-      </div>
-    </Section>
-  );
-};
-
-// --- NEW SkillsSection ---
-const SkillsSection = () => {
-  const skillsData = {
-    computerSkills: [
-      { name: "Python", icon: Code },
-      { name: "JavaScript (React, Node.js)", icon: Code },
-      { name: "Tailwind CSS", icon: Code },
-      { name: "Framer Motion", icon: Code },
-      { name: "Git & GitHub", icon: Github },
-      { name: "Bash/Shell Scripting", icon: Terminal },
-      { name: "SQL", icon: HardDrive },
-      { name: "C/C++ (Basic)", icon: Code },
-    ],
-    scientificTools: [
-      { name: "DFT (VASP, Quantum Espresso)", icon: Atom },
-      { name: "SPM (AFM/STM) Analysis", icon: BarChart3 },
-      { name: "Pymatgen", icon: FileCode },
-      { name: "ASE (Atomic Simulation Environment)", icon: Atom },
-      {
-        name: "Machine Learning (Scikit-learn, TensorFlow/Keras Basics)",
-        icon: Brain,
-      },
-      {
-        name: "Data Visualization (Matplotlib, Seaborn, Plotly)",
-        icon: BarChart3,
-      },
-      { name: "Blender (3D Modeling & Visualization)", icon: Palette },
-    ],
-    languages: [
-      { name: "English", proficiency: "Fluent/C2" },
-      { name: "Portuguese", proficiency: "Native" },
-      { name: "French", proficiency: "Beginner/A2" },
-      { name: "Italian", proficiency: "Beginner/A1" },
-    ],
-  };
-
-  const SkillItem = ({ name, icon: Icon, proficiency }) => (
-    <motion.li
-      className="bg-emerald-50 dark:bg-slate-700/50 p-3 rounded-lg shadow-sm flex items-center space-x-3 hover:shadow-md transition-shadow"
-      whileHover={{ y: -3 }}
-    >
-      {Icon && (
-        <Icon
-          className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0"
-          strokeWidth={2}
-        />
-      )}
-      <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
-        {name}
-      </span>
-      {proficiency && (
-        <span className="text-xs text-gray-500 dark:text-slate-400 ml-auto">
-          ({proficiency})
-        </span>
-      )}
-    </motion.li>
-  );
-
-  return (
-    <Section title="Core Competencies & Skills" icon={Lightbulb} id="skills">
-      <div className="grid md:grid-cols-3 gap-10">
-        {/* Computer Skills */}
-        <div>
-          <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <HardDrive className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
-            Computer Skills
-          </h3>
-          <ul className="space-y-3">
-            {skillsData.computerSkills.map((skill, index) => (
-              <AnimatedSection key={index} delay={index * 0.05} threshold={0.1}>
-                <SkillItem name={skill.name} icon={skill.icon} />
-              </AnimatedSection>
-            ))}
-          </ul>
-        </div>
-
-        {/* Scientific Tools */}
-        <div>
-          <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <Atom className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
-            Scientific Software & Tools
-          </h3>
-          <ul className="space-y-3">
-            {skillsData.scientificTools.map((skill, index) => (
-              <AnimatedSection key={index} delay={index * 0.05} threshold={0.1}>
-                <SkillItem name={skill.name} icon={skill.icon} />
-              </AnimatedSection>
-            ))}
-          </ul>
-        </div>
-
-        {/* Languages */}
-        <div>
-          <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <Globe className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
-            Languages
-          </h3>
-          <ul className="space-y-3">
-            {skillsData.languages.map((lang, index) => (
-              <AnimatedSection key={index} delay={index * 0.05} threshold={0.1}>
-                <SkillItem
-                  name={lang.name}
-                  proficiency={lang.proficiency}
-                  icon={MessageSquare}
-                />
-              </AnimatedSection>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </Section>
-  );
-};
-
 const BlenderCreations = () => {
   const [expandedGalleryId, setExpandedGalleryId] = useState(null);
   const blenderProjects = [
@@ -687,8 +513,6 @@ const BlenderCreations = () => {
       title: "Abstract 3D Art",
       description:
         "Exploring forms, textures, and lighting using Blender for creating visually compelling abstract scenes. This involves procedural texturing and complex node setups for dynamic and intricate results.",
-      artisticStatement:
-        "Focus: Procedural generation, photorealism in abstract contexts.",
       mainImage: blenderA,
       galleryImages: [blenderA1, blenderA2, blenderA3],
     },
@@ -697,8 +521,6 @@ const BlenderCreations = () => {
       title: "Scientific Visualization",
       description:
         "Using Blender to create visualizations for complex scientific concepts, such as molecular structures, quantum phenomena, or astrophysical simulations, making them accessible and understandable to a broader audience.",
-      artisticStatement:
-        "Goal: To accurately and beautifully convey complex scientific data.",
       mainImage: blenderB,
       galleryImages: [blenderB1, blenderB2, blenderB3, blenderB4, blenderB5],
     },
@@ -707,8 +529,6 @@ const BlenderCreations = () => {
       title: "Character/Concept Design",
       description:
         "Developing unique characters and concepts in 3D, from initial sculpting and retopology to final texturing, rigging for animation, or preparing for 3D printing.",
-      artisticStatement:
-        "Exploration: Character storytelling through form and detail.",
       mainImage: blenderC,
       galleryImages: [blenderC1, blenderC2, blenderC3],
     },
@@ -754,50 +574,8 @@ const CLIToolsSection = () => {
       title: "DFT Automation Suite",
       description:
         "A Python-based CLI tool to streamline Density Functional Theory (DFT) calculations, manage input/output files for software like VASP or Quantum Espresso, and automate job submissions to HPC clusters using SLURM or PBS.",
-      problemSolved:
-        "Reduces manual intervention and potential for errors in complex DFT workflows, significantly speeding up research cycles for materials simulation.",
       icon: FileCode,
-      codeExample: (
-        <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
-          <span className="text-emerald-500 dark:text-sky-400">
-            dft-suite run
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --job_type relax
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --struct Si.vasp
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Initializing calculation for Si.vasp...
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Input files generated.
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Submitting job to SLURM ID:{" "}
-          </span>{" "}
-          <span className="text-green-500 dark:text-green-400">12345</span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Monitoring status... Job completed successfully.
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Final energy:{" "}
-          </span>{" "}
-          <span className="text-green-500 dark:text-green-400">
-            -5.42 eV/atom
-          </span>{" "}
-        </>
-      ),
+      codeExample: `> dft-suite run --job_type relax --struct Si.vasp\nInitializing calculation for Si.vasp...\nInput files generated.\nSubmitting job to SLURM ID: 12345\nMonitoring status... Job completed successfully.\nFinal energy: -5.42 eV/atom`,
       tags: ["Python", "CLI", "DFT", "VASP", "HPC", "Automation", "SLURM"],
       githubLink: "https://github.com/filipejunqueira/dft-suite",
     },
@@ -806,46 +584,8 @@ const CLIToolsSection = () => {
       title: "SPM Data Analyzer",
       description:
         "Command-line utilities for processing and analyzing Scanning Probe Microscopy (SPM) data (AFM/STM). Features include drift correction, plane fitting, noise filtering, tip deconvolution, and basic statistical analysis of surface features.",
-      problemSolved:
-        "Provides a consistent and scriptable way to perform common SPM data processing tasks, ensuring reproducibility and enabling batch processing of large datasets.",
       icon: BarChart3,
-      codeExample: (
-        <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
-          <span className="text-emerald-500 dark:text-sky-400">
-            spm-analyzer process
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --file afm_scan.xyz
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --drift_correct --plane_fit
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Processing scan data: afm_scan.xyz
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Applying 2D polynomial drift correction...
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Performing plane fitting (order 1)...
-          </span>{" "}
-          <br />{" "}
-          <span className="text-green-500 dark:text-green-400">
-            Drift corrected. RMS roughness: 0.15 nm
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Saving processed_afm_scan.dat
-          </span>{" "}
-        </>
-      ),
+      codeExample: `> spm-analyzer process --file afm_scan.xyz --drift_correct --plane_fit\nProcessing scan data: afm_scan.xyz\nApplying 2D polynomial drift correction...\nPerforming plane fitting (order 1)...\nDrift corrected. RMS roughness: 0.15 nm\nSaving processed_afm_scan.dat`,
       tags: [
         "Python",
         "CLI",
@@ -862,53 +602,8 @@ const CLIToolsSection = () => {
       title: "Quick Plotter CLI",
       description:
         "A rapid plotting tool for generating publication-quality graphs from CSV or text files directly from the terminal. Supports various plot types, custom labels, legends, and output formats, powered by Matplotlib.",
-      problemSolved:
-        "Eliminates the need to write repetitive plotting scripts for common data visualization tasks, allowing for quick insights and figure generation from the command line.",
       icon: Zap,
-      codeExample: (
-        <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
-          <span className="text-emerald-500 dark:text-sky-400">quickplot</span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --file results.csv
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --x_col "Voltage"
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --y_col "Current"
-          </span>{" "}
-          <span>{" \\"}</span> <br />{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            -t "I-V Curve for Device X"
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --xlabel "Voltage (V)"
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --ylabel "Current (nA)"
-          </span>{" "}
-          <span className="text-yellow-500 dark:text-yellow-400">
-            {" "}
-            --save plot.png
-          </span>{" "}
-          <br />{" "}
-          <span className="text-gray-500 dark:text-slate-500">
-            Generating plot 'I-V Curve for Device X'...
-          </span>{" "}
-          <br />{" "}
-          <span className="text-green-500 dark:text-green-400">
-            Saved to plot_Voltage_vs_Current.png
-          </span>{" "}
-        </>
-      ),
+      codeExample: `> quickplot --file results.csv --x_col "Voltage" --y_col "Current" \\ \n  -t "I-V Curve for Device X" --xlabel "Voltage (V)" --ylabel "Current (nA)" --save plot.png\nGenerating plot 'I-V Curve for Device X'...\nSaved to plot_Voltage_vs_Current.png`,
       tags: [
         "Python",
         "CLI",
@@ -946,7 +641,7 @@ const CLIToolsSection = () => {
           return (
             <motion.div
               key={tool.id}
-              className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col cursor-default"
+              className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 transition-all duration-300 flex flex-col cursor-default border border-gray-200/80 dark:border-slate-700"
               variants={cardVariants}
               initial="hidden"
               whileInView="visible"
@@ -960,16 +655,9 @@ const CLIToolsSection = () => {
                   {tool.title}
                 </h3>
               </div>
-              <p className="text-gray-700 dark:text-slate-300 text-sm mb-3 leading-relaxed">
+              <p className="text-gray-700 dark:text-slate-300 text-sm mb-5 flex-grow leading-relaxed">
                 {tool.description}
               </p>
-              {/* Display Problem Solved */}
-              {tool.problemSolved && (
-                <p className="text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4">
-                  <span className="font-semibold">Impact: </span>
-                  {tool.problemSolved}
-                </p>
-              )}
               <div className="mb-5 flex flex-wrap gap-2">
                 {tool.tags.map((tag) => (
                   <span
@@ -981,8 +669,8 @@ const CLIToolsSection = () => {
                 ))}
               </div>
               {tool.codeExample && (
-                <div className="bg-gray-800 dark:bg-slate-900/80 p-4 rounded-lg font-mono text-xs mb-5 overflow-x-auto shadow-inner">
-                  <pre className="whitespace-pre-wrap leading-relaxed text-sm">
+                <div className="bg-gray-800 dark:bg-slate-900/70 text-gray-300 dark:text-slate-300 p-4 rounded-lg font-mono text-xs mb-5 overflow-x-auto shadow-inner">
+                  <pre className="whitespace-pre-wrap text-emerald-400 dark:text-sky-400">
                     {tool.codeExample}
                   </pre>
                 </div>
@@ -1019,12 +707,8 @@ const ScientistCareer = () => {
       description:
         "Research associate with Prof. Philip Moriarty's nanoscience group, focusing on atomic manipulation and machine learning applications in SPM.",
       icon: FlaskConical,
-      moreDetails: `Key responsibilities and achievements:
-      - Designed and executed advanced NC-AFM/STM experiments for single-atom/molecule manipulation.
-      - Developed Python-based analysis scripts, improving data processing efficiency by ~30%.
-      - Mentored 2 PhD students on experimental techniques and data interpretation.
-      - Investigating novel methodologies for creating 3D atomic structures.
-      - Applied deep learning models for real-time image recognition in microscopy, enhancing feature identification speed.`,
+      moreDetails:
+        "Key responsibilities include designing and conducting experiments using NC-AFM/STM, developing Python scripts for data analysis and instrument control, and mentoring PhD students. Currently investigating novel methods for 3D atomic assembly and applying deep learning for real-time image recognition in microscopy.",
     },
     {
       id: 2,
@@ -1034,11 +718,8 @@ const ScientistCareer = () => {
       description:
         "Thesis: 'Towards 3D printing with atoms: Integrating machine learning with scanning probe microscopy for automated atomic assembly.'",
       icon: GraduationCap,
-      moreDetails: `Research focus and key contributions:
-      - Explored the intersection of nanoscience, DFT, and AI for atomic-scale fabrication.
-      - Operated and maintained complex UHV SPM systems.
-      - Performed DFT simulations (VASP) to model atomic interactions and guide experimental design.
-      - Developed bespoke machine learning algorithms (Python, TensorFlow) to control AFM tip movement for precise atomic placement, achieving X% improvement in placement accuracy.`,
+      moreDetails:
+        "My PhD research explores the intersection of nanoscience and artificial intelligence. This involves extensive work with ultra-high vacuum (UHV) systems, DFT simulations to understand atomic interactions, and the development of bespoke machine learning models to guide the AFM tip for precise atomic manipulation.",
     },
     {
       id: 3,
@@ -1048,11 +729,8 @@ const ScientistCareer = () => {
       description:
         "Analysed big data for clients in various sectors, providing actionable insights through statistical modeling and data visualization.",
       icon: Brain,
-      moreDetails: `Key projects and responsibilities:
-      - Utilized R and Python (Pandas, Scikit-learn) for data mining, statistical analysis, and predictive modeling.
-      - Designed and implemented custom dashboards (e.g., using Plotly/Dash) for clients to monitor KPIs and identify trends.
-      - Delivered market segmentation analysis for a major retail client, leading to a Y% targeted marketing campaign improvement.
-      - Developed customer churn prediction models that identified at-risk customers with Z% accuracy.`,
+      moreDetails:
+        "Utilized R and Python for data mining and predictive analytics. Developed custom dashboards for clients to monitor KPIs and trends. Projects included market segmentation analysis, customer churn prediction, and sales forecasting.",
     },
     {
       id: 4,
@@ -1062,11 +740,8 @@ const ScientistCareer = () => {
       description:
         "Responsible for financial analysis, project viability assessment, and investor relations for a residential development project.",
       icon: Building,
-      moreDetails: `Contributions and outcomes:
-      - Managed project budgets and cash flow projections for a multi-unit residential development.
-      - Conducted thorough market research and competitor analysis to inform pricing and development strategies.
-      - Prepared comprehensive financial reports and presentations for stakeholders and potential investors.
-      - Successfully contributed to securing X amount in partial funding through targeted investor outreach.`,
+      moreDetails:
+        "Managed budgets, conducted market research to inform pricing strategies, and prepared financial reports for stakeholders. Successfully secured partial funding through presentations to private investors.",
     },
     {
       id: 5,
@@ -1076,10 +751,8 @@ const ScientistCareer = () => {
       description:
         "Financial viability analysis for commercial real estate acquisitions and development. Contributed to the creation of the intelligence department.",
       icon: Briefcase,
-      moreDetails: `Key responsibilities and achievements:
-      - Developed and refined complex financial models (DCF, IRR, sensitivity analysis) for valuing commercial properties exceeding $Y million.
-      - Conducted in-depth due diligence on potential acquisitions, identifying key risks and opportunities.
-      - Played an instrumental role in establishing data collection methodologies and market analysis protocols for the newly formed intelligence unit, improving reporting accuracy by Z%.`,
+      moreDetails:
+        "Developed complex financial models (DCF, IRR) for property valuation. Conducted due diligence on potential investments. Played a key role in establishing data collection and market analysis protocols for the newly formed intelligence unit.",
     },
     {
       id: 6,
@@ -1090,10 +763,8 @@ const ScientistCareer = () => {
       description:
         "Comprehensive 5-7 year engineering course with a strong foundation in mathematics, physics, and specialized engineering disciplines.",
       icon: GraduationCap,
-      moreDetails: `Relevant coursework and projects:
-      - Key Modules: Structural Analysis, Electromagnetism, Control Systems, Signal Processing, Thermodynamics, Fluid Mechanics.
-      - Final Year Project: Focused on the design and simulation of a sustainable urban infrastructure element, achieving X in [metric].
-      - Consistently ranked in the top Y% of the cohort in [specific relevant area].`,
+      moreDetails:
+        "Key modules included: Structural Analysis, Electromagnetism, Control Systems, Thermodynamics, and Fluid Mechanics. Final year project focused on sustainable urban infrastructure.",
     },
     {
       id: 7,
@@ -1103,10 +774,8 @@ const ScientistCareer = () => {
       description:
         "Supervisor: Prof. Bernardo Luis Rodrigues de Andrade. Research on hydrofoil design and hydrodynamic efficiency.",
       icon: Anchor,
-      moreDetails: `Project details and contributions:
-      - Utilized computational fluid dynamics (CFD) software to simulate and optimize hydrofoil shapes for reduced drag and improved lift characteristics.
-      - Assisted in the setup and execution of experimental tests in a water tunnel facility, collecting and analyzing performance data.
-      - Contributed to a research paper/report on [specific finding or aspect of the project].`,
+      moreDetails:
+        "Involved computational fluid dynamics (CFD) simulations to optimize hydrofoil shapes for reduced drag and improved stability. Assisted in experimental testing in a water tunnel facility.",
     },
     {
       id: 8,
@@ -1116,10 +785,8 @@ const ScientistCareer = () => {
       description:
         "Supervisor: Prof. Elói Medina Galego. Studied advanced topics in abstract algebra and number theory.",
       icon: Brain,
-      moreDetails: `Areas of study and engagement:
-      - Focused on Group Theory, Ring Theory, and Galois Theory.
-      - Actively participated in weekly advanced seminars and problem-solving sessions.
-      - Developed a deeper understanding of mathematical proofs, abstract structures, and their applications in other scientific fields.`,
+      moreDetails:
+        "Focused on Group Theory and Galois Theory. Participated in weekly seminars and worked on problem sets that extended beyond the standard undergraduate curriculum, fostering a deeper understanding of mathematical proofs and structures.",
     },
   ];
   const handleToggleDetail = (milestoneId) =>
@@ -1143,7 +810,7 @@ const ScientistCareer = () => {
               delay={index * 0.1}
               threshold={0.05}
             >
-              <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60 dark:border dark:border-slate-700">
+              <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60">
                 <div className="flex flex-col sm:flex-row items-start">
                   <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6 pt-1">
                     {MilestoneIcon && (
@@ -1168,7 +835,6 @@ const ScientistCareer = () => {
                         onClick={() => handleToggleDetail(milestone.id)}
                         className="mt-4 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium inline-flex items-center uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
                       >
-                        {" "}
                         {isExpanded ? "Show Less" : "View More"}
                         {isExpanded ? (
                           <ChevronUp size={18} className="ml-1" />
@@ -1252,7 +918,7 @@ const PublicationItem = ({ pub }) => {
     }
   };
   return (
-    <div className="bg-emerald-50 dark:bg-slate-800 p-5 rounded-lg shadow-md hover:shadow-lg dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-shadow duration-300">
+    <div className="bg-emerald-50 dark:bg-slate-800 p-5 rounded-lg shadow-md hover:shadow-lg dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 transition-shadow duration-300">
       <h3 className="text-lg md:text-xl font-medium text-emerald-800 dark:text-emerald-300 mb-1.5">
         {pub.title}
       </h3>
@@ -1509,7 +1175,7 @@ const Footer = () => (
 );
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Default to light mode
   const [db, setDb] = useState(null);
   const [auth, setAuth] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -1595,8 +1261,8 @@ function App() {
   useEffect(() => {
     if (!isAuthReady || !userId) return;
     const loadPreference = async () => {
-      let darkModeEnabled = false;
-      const localPreference = localStorage.getItem(`darkMode-${userId}`);
+      let darkModeEnabled = false; // Default to light mode
+      const localPreference = localStorage.getItem(`darkMode-${userId}`); // User-specific localStorage key
       if (localPreference !== null) {
         darkModeEnabled = JSON.parse(localPreference);
       }
@@ -1635,7 +1301,7 @@ function App() {
       document.documentElement.classList.remove("dark");
     }
     if (isAuthReady && userId) {
-      localStorage.setItem(`darkMode-${userId}`, JSON.stringify(isDarkMode));
+      localStorage.setItem(`darkMode-${userId}`, JSON.stringify(isDarkMode)); // Always save to localStorage as primary/backup
       if (db) {
         const prefDocRef = doc(
           db,
@@ -1692,6 +1358,7 @@ function App() {
     },
   };
 
+  // Show loading only if Firebase is expected (config exists) and auth is not ready yet.
   if (
     !isAuthReady &&
     firebaseConfig &&
@@ -1714,54 +1381,38 @@ function App() {
       />
       <HeroSection />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
-        {/* New sections added here */}
-        <AnimatedSection
-          id="about-animated-wrapper"
-          variants={defaultVariants}
-          delay={0.1}
-        >
-          <AboutMeSection />
-        </AnimatedSection>
-        <AnimatedSection
-          id="skills-animated-wrapper"
-          variants={defaultVariants}
-          delay={0.15}
-        >
-          <SkillsSection />
-        </AnimatedSection>
-
         <AnimatedSection
           id="scientist-animated-wrapper"
           variants={fadeInFromLeft}
-          delay={0.2}
+          delay={0.1}
         >
           <ScientistCareer />
         </AnimatedSection>
         <AnimatedSection
           id="publications-animated-wrapper"
           variants={defaultVariants}
-          delay={0.25}
+          delay={0.2}
         >
           <PublicationsSection />
         </AnimatedSection>
         <AnimatedSection
           id="blender-animated-wrapper"
           variants={fadeInFromRight}
-          delay={0.2}
+          delay={0.1}
         >
           <BlenderCreations />
         </AnimatedSection>
         <AnimatedSection
           id="cli-animated-wrapper"
           variants={defaultVariants}
-          delay={0.25}
+          delay={0.2}
         >
           <CLIToolsSection />
         </AnimatedSection>
         <AnimatedSection
           id="contact-animated-wrapper"
           variants={fadeInFromLeft}
-          delay={0.2}
+          delay={0.1}
         >
           <ContactSection />
         </AnimatedSection>

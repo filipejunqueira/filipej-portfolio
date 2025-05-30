@@ -4,6 +4,10 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 export default {
+  // Add darkMode strategy: 'class'
+  // This tells Tailwind to apply dark mode styles when a 'dark' class
+  // is present on the <html> element (which we'll manage with JavaScript).
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -18,6 +22,13 @@ export default {
         // sans-serif fonts as fallbacks, which is good practice.
         sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
       },
+      // Optional: You can define some dark mode specific color palettes here if you want
+      // to create reusable color names for your dark theme. For example:
+      // colors: {
+      //   'brand-dark-bg': '#1a202c', // A very dark gray/blue
+      //   'brand-dark-card': '#2d3748', // A slightly lighter dark gray/blue for cards
+      //   'brand-dark-text': '#e2e8f0', // A light gray for text in dark mode
+      // }
     },
   },
   plugins: [],

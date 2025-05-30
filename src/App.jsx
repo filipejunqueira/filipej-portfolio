@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { Helmet } from "react-helmet-async"; // SEO: Import Helmet
 
 // Firebase imports
 import { initializeApp } from "firebase/app";
@@ -12,27 +13,23 @@ import {
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
+// Lucide Icons
 import {
   Briefcase,
   Code,
-  Cpu,
   Linkedin,
   Github,
   Mail,
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Box,
   ArrowLeftCircle,
   ArrowRightCircle,
   Image as ImageIcon,
   BookOpen,
-  Award,
   Palette,
   Anchor,
   Brain,
-  Music,
-  Coffee,
   Users,
   Building,
   GraduationCap,
@@ -40,7 +37,6 @@ import {
   Sparkles,
   Loader2,
   AlertTriangle,
-  UserCircle,
   Terminal,
   BarChart3,
   Zap,
@@ -53,12 +49,15 @@ import {
   Atom,
   Globe,
   Lightbulb,
-  Presentation, // Icon for Teaching
+  Presentation,
+  Twitter, // Added Twitter icon
 } from "lucide-react";
 
+// Asset imports
 import profilePic from "./assets/captainbroccoli.png";
 import filipeCv from "./assets/filipecv.pdf";
 
+// Blender Art Images
 import blenderA from "./assets/blenderA.png";
 import blenderA1 from "./assets/blenderA1.png";
 import blenderA2 from "./assets/blenderA2.png";
@@ -106,11 +105,13 @@ const AnimatedSection = ({
 }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
+
   useEffect(() => {
     if (inView) {
       controls.start("visible");
     }
   }, [controls, inView]);
+
   return (
     <motion.div
       ref={ref}
@@ -137,15 +138,18 @@ const Section = ({
   <section
     id={id}
     className="py-16 md:py-20 bg-white dark:bg-slate-800/80 rounded-xl shadow-xl dark:shadow-black/30 mb-12 md:mb-16 px-6 md:px-10"
+    aria-labelledby={`${id}-title`}
   >
     <div className="container mx-auto">
       <h2
+        id={`${id}-title`}
         className={`${titleClassName} font-medium text-emerald-700 dark:text-emerald-400 mb-10 md:mb-14 text-center flex items-center justify-center`}
       >
         {IconComponent && (
           <IconComponent
             className="w-8 h-8 sm:w-10 sm:h-10 mr-3 text-emerald-500 dark:text-emerald-400"
             strokeWidth={2}
+            aria-hidden="true"
           />
         )}
         {title}
@@ -192,22 +196,25 @@ const ProjectCard = ({
   };
 
   return (
-    <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
+    <article className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
       {type === "blender" && mainImage ? (
         <img
           src={mainImage}
-          alt={title}
+          alt={`Main image for ${title} - ${type} project [Review and finalize description]`}
           className="w-full h-52 md:h-60 rounded-md object-cover mb-5 shadow-sm"
           onError={imageErrorHandler}
+          loading="lazy"
         />
       ) : (
         <div
           className={`w-full h-52 md:h-60 rounded-md flex items-center justify-center text-white dark:text-slate-300 text-xl font-semibold mb-5 ${imagePlaceholderColor || "bg-gray-300 dark:bg-slate-700"}`}
+          role="img"
+          aria-label={`${title} project placeholder image`}
         >
           {type === "blender" ? (
-            <Palette size={52} strokeWidth={1.5} />
+            <Palette size={52} strokeWidth={1.5} aria-hidden="true" />
           ) : (
-            <Code size={52} strokeWidth={1.5} />
+            <Code size={52} strokeWidth={1.5} aria-hidden="true" />
           )}
         </div>
       )}
@@ -233,12 +240,13 @@ const ProjectCard = ({
         <button
           onClick={toggleDescription}
           className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center mb-4 text-sm font-medium self-start uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+          aria-expanded={isDescriptionExpanded}
         >
           {isDescriptionExpanded ? "Show Less" : "Show More"}
           {isDescriptionExpanded ? (
-            <ChevronUp size={18} className="ml-1" />
+            <ChevronUp size={18} className="ml-1" aria-hidden="true" />
           ) : (
-            <ChevronDown size={18} className="ml-1" />
+            <ChevronDown size={18} className="ml-1" aria-hidden="true" />
           )}
         </button>
       )}
@@ -250,27 +258,43 @@ const ProjectCard = ({
             <button
               onClick={onToggleGallery}
               className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start mr-4 text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+              aria-expanded={isGalleryOpen}
+              aria-controls={`${title.replace(/\s+/g, "-").toLowerCase()}-gallery`}
             >
               {isGalleryOpen ? "Hide Images" : "View Images"}
               {isGalleryOpen ? (
-                <ChevronUp size={18} className="ml-2" />
+                <ChevronUp size={18} className="ml-2" aria-hidden="true" />
               ) : (
-                <ImageIcon size={18} className="ml-2" />
+                <ImageIcon size={18} className="ml-2" aria-hidden="true" />
               )}
             </button>
           )}
+        {link && (
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+          >
+            View Project <ExternalLink size={16} className="ml-1.5" />
+          </a>
+        )}
       </div>
       {type === "blender" &&
         isGalleryOpen &&
         galleryImages &&
         galleryImages.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700">
+          <div
+            id={`${title.replace(/\s+/g, "-").toLowerCase()}-gallery`}
+            className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700"
+          >
             <div className="relative mb-2">
               <img
                 src={galleryImages[currentImageIndex]}
-                alt={`${title} - Gallery Image ${currentImageIndex + 1}`}
+                alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length} [Review and finalize description]`}
                 className="w-full h-60 md:h-72 rounded-md object-cover shadow-inner bg-gray-100 dark:bg-slate-700"
                 onError={imageErrorHandler}
+                loading="lazy"
               />
               {galleryImages.length > 1 && (
                 <>
@@ -279,14 +303,14 @@ const ProjectCard = ({
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-black/50 focus:ring-white"
                     aria-label="Previous Image"
                   >
-                    <ArrowLeftCircle size={22} />
+                    <ArrowLeftCircle size={22} aria-hidden="true" />
                   </button>
                   <button
                     onClick={nextImage}
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-black/50 focus:ring-white"
                     aria-label="Next Image"
                   >
-                    <ArrowRightCircle size={22} />
+                    <ArrowRightCircle size={22} aria-hidden="true" />
                   </button>
                 </>
               )}
@@ -298,7 +322,7 @@ const ProjectCard = ({
             )}
           </div>
         )}
-    </div>
+    </article>
   );
 };
 
@@ -309,7 +333,7 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
     { id: "home", label: "Home" },
     { id: "about", label: "About" },
     { id: "skills", label: "Skills" },
-    { id: "teaching", label: "Teaching" }, // Added Teaching link
+    { id: "teaching", label: "Teaching" },
     { id: "scientist", label: "Career & Education" },
     { id: "publications", label: "Publications" },
     { id: "blender", label: "Blender Art" },
@@ -330,16 +354,20 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
   };
 
   return (
-    <nav className="bg-emerald-600 dark:bg-slate-800 text-white sticky top-0 z-50 shadow-lg dark:shadow-black/30">
+    <nav
+      className="bg-emerald-600 dark:bg-slate-800 text-white sticky top-0 z-50 shadow-lg dark:shadow-black/30"
+      aria-label="Main navigation"
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <motion.img
               src={profilePic}
-              alt="Filipe L. Q. Junqueira"
+              alt="Filipe L. Q. Junqueira - Profile Picture [Review and finalize description]"
               className="w-10 h-10 rounded-full mr-3 object-cover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
+              loading="lazy"
             />
             <motion.a
               href="#home"
@@ -370,15 +398,17 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
             <motion.button
               onClick={toggleDarkMode}
               className="ml-6 p-2 rounded-full hover:bg-emerald-700/50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-slate-300 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800 transition-colors duration-200"
-              aria-label="Toggle dark mode"
+              aria-label={
+                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
               whileHover={{ scale: 1.15, rotate: isDarkMode ? -15 : 15 }}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
               {isDarkMode ? (
-                <Sun size={20} className="text-yellow-400" />
+                <Sun size={20} className="text-yellow-400" aria-hidden="true" />
               ) : (
-                <Moon size={20} className="text-slate-300" />
+                <Moon size={20} className="text-slate-300" aria-hidden="true" />
               )}
             </motion.button>
           </div>
@@ -386,15 +416,17 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
             <motion.button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-emerald-100 dark:text-slate-300 hover:text-white dark:hover:text-white hover:bg-emerald-700/50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-slate-300 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800 mr-2"
-              aria-label="Toggle dark mode"
+              aria-label={
+                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
               whileHover={{ scale: 1.15, rotate: isDarkMode ? -15 : 15 }}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
               {isDarkMode ? (
-                <Sun size={22} className="text-yellow-400" />
+                <Sun size={22} className="text-yellow-400" aria-hidden="true" />
               ) : (
-                <Moon size={22} />
+                <Moon size={22} aria-hidden="true" />
               )}
             </motion.button>
             <button
@@ -467,14 +499,15 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
 };
 
 const HeroSection = () => (
-  <section
+  <header
     id="home"
     className="bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-slate-800 dark:to-slate-900 text-white py-24 md:py-32"
+    aria-labelledby="main-heading"
   >
     <div className="container mx-auto text-center px-6 flex flex-col items-center">
       <motion.img
         src={profilePic}
-        alt="Filipe L. Q. Junqueira profile"
+        alt="Filipe L. Q. Junqueira - Main Profile Picture [Review and finalize description]"
         className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover mb-8 shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -484,8 +517,10 @@ const HeroSection = () => (
           type: "spring",
           stiffness: 120,
         }}
+        loading="eager"
       />
       <motion.h1
+        id="main-heading"
         className="text-4xl sm:text-5xl md:text-6xl font-light mb-6 dark:text-slate-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -529,7 +564,7 @@ const HeroSection = () => (
         View Full CV
       </motion.a>
     </div>
-  </section>
+  </header>
 );
 
 const AboutMeSection = () => {
@@ -607,6 +642,7 @@ const SkillsSection = () => {
         <Icon
           className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0"
           strokeWidth={2}
+          aria-hidden="true"
         />
       )}
       <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
@@ -625,7 +661,10 @@ const SkillsSection = () => {
       <div className="grid md:grid-cols-3 gap-10">
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <HardDrive className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
+            <HardDrive
+              className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400"
+              aria-hidden="true"
+            />{" "}
             Computer Skills
           </h3>
           <ul className="space-y-3">
@@ -638,7 +677,10 @@ const SkillsSection = () => {
         </div>
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <Atom className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
+            <Atom
+              className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400"
+              aria-hidden="true"
+            />{" "}
             Scientific Software & Tools
           </h3>
           <ul className="space-y-3">
@@ -651,7 +693,10 @@ const SkillsSection = () => {
         </div>
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
-            <Globe className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
+            <Globe
+              className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400"
+              aria-hidden="true"
+            />{" "}
             Languages
           </h3>
           <ul className="space-y-3">
@@ -671,7 +716,6 @@ const SkillsSection = () => {
   );
 };
 
-// --- NEW TeachingSection ---
 const TeachingSection = () => {
   const teachingPoints = [
     "Extensive experience tutoring students for International Mathematics Olympiads (IMO), focusing on advanced problem-solving techniques in Number Theory, Combinatorics, Algebra, and Geometry.",
@@ -682,8 +726,6 @@ const TeachingSection = () => {
 
   return (
     <Section title="Teaching & Tutoring" icon={Presentation} id="teaching">
-      {" "}
-      {/* Using Presentation icon */}
       <div className="max-w-3xl mx-auto space-y-6">
         <motion.p
           className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed"
@@ -721,12 +763,12 @@ const TeachingSection = () => {
           }}
         >
           <a
-            href="http://filipej.com" // Make sure to use http:// or https://
+            href="http://filipej.com"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
           >
-            Visit My Tutoring Site <ExternalLink size={18} />
+            Visit My Tutoring Site <ExternalLink size={18} aria-hidden="true" />
           </a>
         </motion.div>
       </div>
@@ -814,43 +856,42 @@ const CLIToolsSection = () => {
       icon: FileCode,
       codeExample: (
         <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
+          <span className="text-slate-500 dark:text-slate-400">&gt; </span>
           <span className="text-emerald-500 dark:text-sky-400">
             dft-suite run
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --job_type relax
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --struct Si.vasp
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Initializing calculation for Si.vasp...
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Input files generated.
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Submitting job to SLURM ID:{" "}
-          </span>{" "}
-          <span className="text-green-500 dark:text-green-400">12345</span>{" "}
-          <br />{" "}
+          </span>
+          <span className="text-green-500 dark:text-green-400">12345</span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Monitoring status... Job completed successfully.
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Final energy:{" "}
-          </span>{" "}
+          </span>
           <span className="text-green-500 dark:text-green-400">
             -5.42 eV/atom
-          </span>{" "}
+          </span>
         </>
       ),
       tags: ["Python", "CLI", "DFT", "VASP", "HPC", "Automation", "SLURM"],
@@ -866,39 +907,38 @@ const CLIToolsSection = () => {
       icon: BarChart3,
       codeExample: (
         <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
+          <span className="text-slate-500 dark:text-slate-400">&gt; </span>
           <span className="text-emerald-500 dark:text-sky-400">
             spm-analyzer process
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --file afm_scan.xyz
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --drift_correct --plane_fit
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Processing scan data: afm_scan.xyz
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Applying 2D polynomial drift correction...
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Performing plane fitting (order 1)...
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-green-500 dark:text-green-400">
             Drift corrected. RMS roughness: 0.15 nm
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Saving processed_afm_scan.dat
-          </span>{" "}
+          </span>
         </>
       ),
       tags: [
@@ -922,46 +962,46 @@ const CLIToolsSection = () => {
       icon: Zap,
       codeExample: (
         <>
-          {" "}
-          <span className="text-slate-500 dark:text-slate-400">&gt; </span>{" "}
-          <span className="text-emerald-500 dark:text-sky-400">quickplot</span>{" "}
+          <span className="text-slate-500 dark:text-slate-400">&gt; </span>
+          <span className="text-emerald-500 dark:text-sky-400">quickplot</span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --file results.csv
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --x_col "Voltage"
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --y_col "Current"
-          </span>{" "}
-          <span>{" \\"}</span> <br />{" "}
+          </span>
+          <span>{" \\"}</span>
+          <br />
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             -t "I-V Curve for Device X"
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --xlabel "Voltage (V)"
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --ylabel "Current (nA)"
-          </span>{" "}
+          </span>
           <span className="text-yellow-500 dark:text-yellow-400">
             {" "}
             --save plot.png
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-gray-500 dark:text-slate-500">
             Generating plot 'I-V Curve for Device X'...
-          </span>{" "}
-          <br />{" "}
+          </span>
+          <br />
           <span className="text-green-500 dark:text-green-400">
             Saved to plot_Voltage_vs_Current.png
-          </span>{" "}
+          </span>
         </>
       ),
       tags: [
@@ -999,7 +1039,7 @@ const CLIToolsSection = () => {
         {cliToolsData.map((tool, index) => {
           const ToolIcon = tool.icon;
           return (
-            <motion.div
+            <motion.article
               key={tool.id}
               className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col cursor-default"
               variants={cardVariants}
@@ -1008,10 +1048,17 @@ const CLIToolsSection = () => {
               whileHover="hover"
               viewport={{ once: true, amount: 0.1 }}
               custom={index}
+              aria-labelledby={`cli-tool-title-${tool.id}`}
             >
               <div className="flex items-center text-emerald-600 dark:text-emerald-400 mb-4">
-                <ToolIcon className="h-9 w-9 mr-3.5 stroke-[1.75] flex-shrink-0" />
-                <h3 className="text-lg lg:text-xl font-medium text-emerald-800 dark:text-emerald-300">
+                <ToolIcon
+                  className="h-9 w-9 mr-3.5 stroke-[1.75] flex-shrink-0"
+                  aria-hidden="true"
+                />
+                <h3
+                  id={`cli-tool-title-${tool.id}`}
+                  className="text-lg lg:text-xl font-medium text-emerald-800 dark:text-emerald-300"
+                >
                   {tool.title}
                 </h3>
               </div>
@@ -1052,9 +1099,9 @@ const CLIToolsSection = () => {
                 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <Github size={18} /> View on GitHub
+                <Github size={18} aria-hidden="true" /> View on GitHub
               </motion.a>
-            </motion.div>
+            </motion.article>
           );
         })}
       </div>
@@ -1197,15 +1244,24 @@ const ScientistCareer = () => {
               delay={index * 0.1}
               threshold={0.05}
             >
-              <div className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60 dark:border dark:border-slate-700">
+              <article
+                className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60 dark:border dark:border-slate-700"
+                aria-labelledby={`career-title-${milestone.id}`}
+              >
                 <div className="flex flex-col sm:flex-row items-start">
                   <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6 pt-1">
                     {MilestoneIcon && (
-                      <MilestoneIcon className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 dark:text-emerald-400 strokeWidth={1.5}" />
+                      <MilestoneIcon
+                        className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 dark:text-emerald-400 strokeWidth={1.5}"
+                        aria-hidden="true"
+                      />
                     )}
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300">
+                    <h3
+                      id={`career-title-${milestone.id}`}
+                      className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300"
+                    >
                       {milestone.role}
                     </h3>
                     <p className="text-base text-emerald-700 dark:text-emerald-400 font-normal mt-1">
@@ -1221,13 +1277,22 @@ const ScientistCareer = () => {
                       <button
                         onClick={() => handleToggleDetail(milestone.id)}
                         className="mt-4 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium inline-flex items-center uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+                        aria-expanded={isExpanded}
+                        aria-controls={`career-details-${milestone.id}`}
                       >
-                        {" "}
                         {isExpanded ? "Show Less" : "View More"}
                         {isExpanded ? (
-                          <ChevronUp size={18} className="ml-1" />
+                          <ChevronUp
+                            size={18}
+                            className="ml-1"
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <ChevronDown size={18} className="ml-1" />
+                          <ChevronDown
+                            size={18}
+                            className="ml-1"
+                            aria-hidden="true"
+                          />
                         )}
                       </button>
                     )}
@@ -1235,6 +1300,7 @@ const ScientistCareer = () => {
                 </div>
                 {isExpanded && milestone.moreDetails && (
                   <motion.div
+                    id={`career-details-${milestone.id}`}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
@@ -1246,7 +1312,7 @@ const ScientistCareer = () => {
                     </p>
                   </motion.div>
                 )}
-              </div>
+              </article>
             </AnimatedSection>
           );
         })}
@@ -1260,6 +1326,7 @@ const PublicationItem = ({ pub }) => {
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const [summaryError, setSummaryError] = useState("");
   const [showSummary, setShowSummary] = useState(false);
+
   const handleGenerateSummary = async () => {
     if (summary && !showSummary) {
       setShowSummary(true);
@@ -1269,15 +1336,18 @@ const PublicationItem = ({ pub }) => {
       setShowSummary(false);
       return;
     }
+
     setIsLoadingSummary(true);
     setSummaryError("");
     setSummary("");
     setShowSummary(true);
+
     const prompt = `Please provide a concise summary or explain the significance of the following scientific publication in 2-3 sentences, suitable for a general audience. Focus on the key findings or impact:\nTitle: "${pub.title}"\nAuthors: ${pub.authors}\nJournal: ${pub.journal}\nYear: ${pub.year}\n${pub.note ? `Note: ${pub.note}` : ""}\nWhat are the main takeaways or importance of this research?`;
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
     const apiKeyGen = "";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyGen}`;
+
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -1295,19 +1365,29 @@ const PublicationItem = ({ pub }) => {
       if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
         setSummary(result.candidates[0].content.parts[0].text);
       } else {
-        console.error("Unexpected API response:", result);
-        throw new Error("Failed to extract summary.");
+        console.error("Unexpected API response structure:", result);
+        throw new Error("Failed to extract summary from API response.");
       }
     } catch (error) {
       console.error("Summary generation error:", error);
-      setSummaryError(error.message || "Error generating summary.");
+      setSummaryError(
+        error.message ||
+          "An unknown error occurred while generating the summary.",
+      );
     } finally {
       setIsLoadingSummary(false);
     }
   };
+
   return (
-    <div className="bg-emerald-50 dark:bg-slate-800 p-5 rounded-lg shadow-md hover:shadow-lg dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-shadow duration-300">
-      <h3 className="text-lg md:text-xl font-medium text-emerald-800 dark:text-emerald-300 mb-1.5">
+    <article
+      className="bg-emerald-50 dark:bg-slate-800 p-5 rounded-lg shadow-md hover:shadow-lg dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-shadow duration-300"
+      aria-labelledby={`pub-title-${pub.id}`}
+    >
+      <h3
+        id={`pub-title-${pub.id}`}
+        className="text-lg md:text-xl font-medium text-emerald-800 dark:text-emerald-300 mb-1.5"
+      >
         {pub.title}
       </h3>
       <p className="text-sm text-gray-700 dark:text-slate-400 italic mb-1 truncate-authors">
@@ -1328,14 +1408,17 @@ const PublicationItem = ({ pub }) => {
           rel="noopener noreferrer"
           className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium inline-flex items-center mb-2 sm:mb-0 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
         >
-          View Publication <ExternalLink size={16} className="ml-1.5" />
+          View Publication{" "}
+          <ExternalLink size={16} className="ml-1.5" aria-hidden="true" />
         </a>
         <button
           onClick={handleGenerateSummary}
           disabled={isLoadingSummary}
           className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+          aria-controls={`pub-summary-${pub.id}`}
+          aria-expanded={showSummary}
         >
-          <Sparkles size={16} className="mr-1.5" />
+          <Sparkles size={16} className="mr-1.5" aria-hidden="true" />
           {isLoadingSummary
             ? "Thinking..."
             : showSummary && summary
@@ -1345,6 +1428,7 @@ const PublicationItem = ({ pub }) => {
       </div>
       {showSummary && (
         <motion.div
+          id={`pub-summary-${pub.id}`}
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
@@ -1353,13 +1437,24 @@ const PublicationItem = ({ pub }) => {
         >
           {isLoadingSummary && (
             <div className="flex items-center text-sm text-gray-600 dark:text-slate-400">
-              <Loader2 size={18} className="animate-spin mr-2" />
+              <Loader2
+                size={18}
+                className="animate-spin mr-2"
+                aria-hidden="true"
+              />
               Generating explanation...
             </div>
           )}
           {summaryError && !isLoadingSummary && (
-            <div className="flex items-start text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md">
-              <AlertTriangle size={18} className="mr-2 flex-shrink-0" />
+            <div
+              className="flex items-start text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md"
+              role="alert"
+            >
+              <AlertTriangle
+                size={18}
+                className="mr-2 flex-shrink-0"
+                aria-hidden="true"
+              />
               <div>
                 <strong>Error:</strong> {summaryError}
                 <p className="text-xs mt-1">Please try again later.</p>
@@ -1378,7 +1473,7 @@ const PublicationItem = ({ pub }) => {
           )}
         </motion.div>
       )}
-    </div>
+    </article>
   );
 };
 
@@ -1474,7 +1569,11 @@ const HoverFlipButton = ({
           aria-hidden={isHovered}
         >
           {IconInitial && (
-            <IconInitial size={18} className="mr-2 flex-shrink-0" />
+            <IconInitial
+              size={18}
+              className="mr-2 flex-shrink-0"
+              aria-hidden="true"
+            />
           )}{" "}
           <span className="truncate">{textInitial}</span>
         </span>
@@ -1499,17 +1598,17 @@ const ContactSection = () => {
       bgColorInitial: "bg-red-500 dark:bg-red-600",
       bgColorHover: "hover:bg-red-600 dark:hover:bg-red-700",
       isExternal: false,
-      ariaLabel: "Email Filipe (Personal)",
+      ariaLabel: "Email Filipe (Personal: filipelqj@gmail.com)",
     },
     {
       href: "mailto:filipe.junqueira@nottingham.ac.uk",
       IconInitial: Mail,
-      textInitial: "Nottingham Email",
+      textInitial: "Work Email", // Changed from "Nottingham Email"
       textHover: "filipe.junqueira@nottingham.ac.uk",
       bgColorInitial: "bg-emerald-500 dark:bg-emerald-600",
       bgColorHover: "hover:bg-emerald-600 dark:hover:bg-emerald-700",
       isExternal: false,
-      ariaLabel: "Email Filipe (Nottingham)",
+      ariaLabel: "Email Filipe (Work: filipe.junqueira@nottingham.ac.uk)",
     },
     {
       href: "https://linkedin.com/in/filipejunqueira",
@@ -1529,6 +1628,16 @@ const ContactSection = () => {
       bgColorHover: "hover:bg-gray-800 dark:hover:bg-slate-600",
       ariaLabel: "Filipe Junqueira on GitHub",
     },
+    {
+      // New Twitter/X button
+      href: "https://x.com/CaptBroccoli",
+      IconInitial: Twitter,
+      textInitial: "Twitter / X",
+      textHover: "@CaptBroccoli",
+      bgColorInitial: "bg-sky-500 dark:bg-sky-600", // Twitter blue
+      bgColorHover: "hover:bg-sky-600 dark:hover:bg-sky-700",
+      ariaLabel: "Filipe Junqueira (Captain Broccoli) on Twitter/X",
+    },
   ];
   return (
     <Section title="Get In Touch" icon={Users} id="contact">
@@ -1537,7 +1646,8 @@ const ContactSection = () => {
         connecting with like-minded individuals. Whether it's about nanoscience,
         3D art, or software development, feel free to reach out!
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      {/* Updated grid classes to better accommodate 5 buttons */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
         {contactButtons.map((button, index) => (
           <AnimatedSection key={index} delay={index * 0.1} threshold={0.1}>
             <HoverFlipButton {...button} />
@@ -1556,7 +1666,7 @@ const Footer = () => (
         reserved.
       </p>
       <p className="text-xs mt-2 opacity-80 dark:opacity-70">
-        Crafted with React, Tailwind CSS, Framer Motion & Love :-)
+        Crafted with React, Tailwind CSS, Framer Motion &amp; Love :-)
       </p>
     </div>
   </footer>
@@ -1568,6 +1678,63 @@ function App() {
   const [auth, setAuth] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+
+  const personStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Filipe L. Q. Junqueira",
+    url: "https://filipej.dev",
+    image: "https://filipej.dev/og-image.png",
+    jobTitle: "Research Associate",
+    worksFor: {
+      "@type": "Organization",
+      name: "University of Nottingham",
+      sameAs: "https://www.nottingham.ac.uk/physics/",
+    },
+    alumniOf: [
+      {
+        "@type": "CollegeOrUniversity",
+        name: "University of Nottingham",
+        sameAs: "https://www.nottingham.ac.uk",
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        name: "King's College London",
+        sameAs: "https://www.kcl.ac.uk/",
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        name: "Polytechnic School of Engineering, University of São Paulo",
+        sameAs: "https://www.poli.usp.br/",
+      },
+    ],
+    knowsAbout: [
+      "Nanoscience",
+      "3D printing with atoms",
+      "NC-AFM",
+      "STM",
+      "DFT",
+      "Machine Learning",
+      "Blender 3D Art",
+      "Python",
+      "Scientific Visualization",
+      "Physics",
+      "Computational Physics",
+    ],
+    sameAs: [
+      "https://www.linkedin.com/in/filipejunqueira/",
+      "https://github.com/filipejunqueira",
+      "https://x.com/CaptBroccoli", // Added Twitter/X profile to structured data
+      // "https://scholar.google.com/citations?user=YOUR_GOOGLE_SCHOLAR_ID",
+      // "https://www.researchgate.net/profile/YOUR_RESEARCHGATE_PROFILE",
+    ],
+    description:
+      "Portfolio of Filipe L. Q. Junqueira, showcasing research in nanoscience, 3D atomic printing, advanced microscopy (NC-AFM/STM), Density Functional Theory (DFT), machine learning applications, Blender 3D art, and custom CLI tool development for scientific workflows.",
+    nationality: {
+      "@type": "Country",
+      name: "Brazilian",
+    },
+  };
 
   useEffect(() => {
     if (firebaseConfig && Object.keys(firebaseConfig).length > 0 && appId) {
@@ -1754,13 +1921,22 @@ function App() {
   ) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-emerald-50 dark:bg-slate-900">
-        <Loader2 className="w-12 h-12 text-emerald-500 dark:text-emerald-400 animate-spin" />
+        <Loader2
+          className="w-12 h-12 text-emerald-500 dark:text-emerald-400 animate-spin"
+          aria-label="Loading content"
+        />
       </div>
     );
   }
 
   return (
     <div className="font-sans bg-emerald-50/50 dark:bg-slate-900 text-gray-800 dark:text-slate-200 min-h-screen transition-colors duration-300">
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(personStructuredData)}
+        </script>
+      </Helmet>
+
       <Navbar
         setActiveSection={setActiveSection}
         toggleDarkMode={toggleDarkMode}
@@ -1782,7 +1958,6 @@ function App() {
         >
           <SkillsSection />
         </AnimatedSection>
-        {/* New Teaching Section Added Here */}
         <AnimatedSection
           id="teaching-animated-wrapper"
           variants={defaultVariants}

@@ -1,63 +1,87 @@
+// Import React and necessary hooks from the 'react' library.
+// useState: For managing component-level state.
+// useEffect: For handling side effects (e.g., data fetching, subscriptions, manual DOM manipulations).
+// useCallback: For memoizing functions, preventing unnecessary re-creations.
 import React, { useState, useEffect, useCallback } from "react";
+
+// Import animation utilities from 'framer-motion'.
+// motion: A prefix for HTML/SVG elements to enable animations.
+// useAnimation: A hook to manually control animation sequences.
 import { motion, useAnimation } from "framer-motion";
+
+// Import 'useInView' hook from 'react-intersection-observer'.
+// This hook detects when an element enters or leaves the viewport.
 import { useInView } from "react-intersection-observer";
-import { Helmet } from "react-helmet-async"; // SEO: Import Helmet
 
-// Firebase imports
-import { initializeApp } from "firebase/app";
+// Import 'Helmet' from 'react-helmet-async' for managing document head elements (SEO).
+// This allows dynamic updates to <title>, <meta>, <script type="application/ld+json">, etc.
+import { Helmet } from "react-helmet-async";
+
+// --- Firebase Imports ---
+// These are for integrating Firebase services (authentication, database).
+import { initializeApp } from "firebase/app"; // Core Firebase app initialization.
 import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged,
-  signInWithCustomToken,
+  getAuth, // Firebase Authentication service.
+  signInAnonymously, // Method for anonymous user sign-in.
+  onAuthStateChanged, // Listener for changes in user authentication state.
+  signInWithCustomToken, // Method for signing in with a custom token.
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
-
-// Lucide Icons
 import {
-  Briefcase,
-  Code,
-  Linkedin,
-  Github,
-  Mail,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
-  ArrowLeftCircle,
-  ArrowRightCircle,
-  Image as ImageIcon,
-  BookOpen,
-  Palette,
-  Anchor,
-  Brain,
-  Users,
-  Building,
-  GraduationCap,
-  FlaskConical,
-  Sparkles,
-  Loader2,
-  AlertTriangle,
-  Terminal,
-  BarChart3,
-  Zap,
-  FileCode,
-  Sun,
-  Moon,
-  User,
-  MessageSquare,
-  HardDrive,
-  Atom,
-  Globe,
-  Lightbulb,
-  Presentation,
-  Twitter, // Added Twitter icon
+  getFirestore, // Firestore database service.
+  doc, // Reference to a document in Firestore.
+  setDoc, // Method to write or overwrite a document.
+  getDoc, // Method to read a document.
+} from "firebase/firestore";
+
+// --- Lucide Icons ---
+// Import specific icons from the 'lucide-react' library for UI elements.
+// These are SVG icons, generally good for performance and scalability.
+import {
+  Briefcase, // Icon for career/work.
+  Code, // Icon for coding/skills.
+  Linkedin, // LinkedIn social icon.
+  Github, // GitHub social icon.
+  Mail, // Email icon.
+  ExternalLink, // Icon indicating an external link.
+  ChevronDown, // Down arrow icon.
+  ChevronUp, // Up arrow icon.
+  ArrowLeftCircle, // Left arrow for carousels/navigation.
+  ArrowRightCircle, // Right arrow for carousels/navigation.
+  Image as ImageIcon, // Image icon (renamed to avoid conflict with <img>).
+  BookOpen, // Icon for publications.
+  Palette, // Icon for art/design.
+  Anchor, // Icon for specific internships/projects.
+  Brain, // Icon for skills/intelligence.
+  Users, // Icon for contact/collaboration.
+  Building, // Icon for company/real estate.
+  GraduationCap, // Icon for education.
+  FlaskConical, // Icon for science/research.
+  Sparkles, // Icon for AI features/highlights.
+  Loader2, // Loading spinner icon.
+  AlertTriangle, // Warning/error icon.
+  Terminal, // Icon for CLI tools.
+  BarChart3, // Icon for data analysis/visualization.
+  Zap, // Icon for speed/quick tools.
+  FileCode, // Icon for code files/scripts.
+  Sun, // Icon for light mode.
+  Moon, // Icon for dark mode.
+  User, // Generic user icon.
+  MessageSquare, // Icon for languages/communication.
+  HardDrive, // Icon for computer skills/storage.
+  Atom, // Icon for scientific tools/physics.
+  Globe, // Icon for languages/global.
+  Lightbulb, // Icon for skills/ideas.
+  Presentation, // Icon for teaching.
+  Twitter, // Twitter/X social icon.
 } from "lucide-react";
 
-// Asset imports
-import profilePic from "./assets/captainbroccoli.png";
-import filipeCv from "./assets/filipecv.pdf";
+// --- Asset Imports ---
+// Import static assets like images and documents.
+// These are typically located in the 'src/assets' folder or 'public' folder.
+import profilePic from "./assets/captainbroccoli.png"; // Main profile picture.
+import filipeCv from "./assets/filipecv.pdf"; // Link to the CV PDF.
 
-// Blender Art Images
+// Import Blender Art Images for the gallery.
 import blenderA from "./assets/blenderA.png";
 import blenderA1 from "./assets/blenderA1.png";
 import blenderA2 from "./assets/blenderA2.png";
@@ -73,28 +97,51 @@ import blenderC1 from "./assets/blenderC1.png";
 import blenderC2 from "./assets/blenderC2.png";
 import blenderC3 from "./assets/blenderC3.png";
 
-// Firebase configuration (from Canvas environment)
+// --- Firebase Configuration ---
+// Attempt to load Firebase configuration from global variables (often injected by a CI/CD environment or a specific setup like Canvas LMS).
 const firebaseConfigString =
-  typeof __firebase_config !== "undefined" ? __firebase_config : "{}";
-let firebaseConfig = {};
+  typeof __firebase_config !== "undefined" ? __firebase_config : "{}"; // Default to an empty JSON string if not found.
+let firebaseConfig = {}; // Initialize as an empty object.
+
+// Try to parse the Firebase config string.
 try {
   firebaseConfig = JSON.parse(firebaseConfigString);
+  // Warn if the parsed config is empty, indicating Firebase might not work as expected.
   if (Object.keys(firebaseConfig).length === 0) {
     console.warn(
-      "Firebase config is empty. Dark mode preference will use localStorage.",
+      "Firebase config is empty. Dark mode preference will use localStorage primarily.",
     );
   }
 } catch (e) {
+  // Log an error if parsing fails and keep firebaseConfig as an empty object.
   console.error("Error parsing Firebase config:", e);
-  firebaseConfig = {};
+  firebaseConfig = {}; // Ensure it's an object to prevent further errors.
 }
+// Get App ID, also potentially from a global variable, with a fallback.
 const appId = typeof __app_id !== "undefined" ? __app_id : "default-app-id";
 
 // --- AnimatedSection Component ---
+// A reusable component that animates its children when they scroll into view.
+// It uses Framer Motion for animation and React Intersection Observer to detect visibility.
+
+// Default animation variants for Framer Motion.
+// 'hidden': Initial state (opacity 0, slightly offset on Y-axis).
+// 'visible': Target state (opacity 1, original Y position).
 const defaultVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
+
+/**
+ * AnimatedSection Component: Wraps children in a motion.div for scroll-triggered animations.
+ * @param {object} props - Component props.
+ * @param {React.ReactNode} props.children - The content to be animated.
+ * @param {string} [props.className=""] - Optional CSS classes for the wrapper div.
+ * @param {string} props.id - A unique ID for the section (optional, but good for targeting).
+ * @param {object} [props.variants=defaultVariants] - Framer Motion animation variants.
+ * @param {number} [props.delay=0] - Animation delay in seconds.
+ * @param {number} [props.threshold=0.1] - Percentage of the element that needs to be in view to trigger the animation.
+ */
 const AnimatedSection = ({
   children,
   className = "",
@@ -103,24 +150,30 @@ const AnimatedSection = ({
   delay = 0,
   threshold = 0.1,
 }) => {
+  // `useAnimation` hook from Framer Motion to programmatically control animations.
   const controls = useAnimation();
+  // `useInView` hook to track if the component is visible in the viewport.
+  // `triggerOnce: true` ensures the animation only runs once.
+  // `threshold` determines how much of the element must be visible to trigger.
   const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
 
+  // `useEffect` hook to start the animation when the component comes into view.
   useEffect(() => {
     if (inView) {
-      controls.start("visible");
+      controls.start("visible"); // Start the 'visible' animation variant.
     }
-  }, [controls, inView]);
+  }, [controls, inView]); // Dependencies: re-run effect if 'controls' or 'inView' changes.
 
   return (
+    // `motion.div` is a Framer Motion component that enables animations on a div.
     <motion.div
-      ref={ref}
-      id={id}
-      className={className}
-      initial="hidden"
-      animate={controls}
-      variants={variants}
-      transition={{ duration: 0.6, delay }}
+      ref={ref} // Assign the ref from `useInView` to this element.
+      id={id} // HTML id attribute.
+      className={className} // CSS classes.
+      initial="hidden" // Initial animation state.
+      animate={controls} // Link animation controls.
+      variants={variants} // Animation variants to use.
+      transition={{ duration: 0.6, delay }} // Animation transition properties.
     >
       {children}
     </motion.div>
@@ -128,37 +181,70 @@ const AnimatedSection = ({
 };
 
 // --- Reusable Helper Components ---
+
+/**
+ * Section Component: A styled container for main content sections of the page.
+ * Provides consistent padding, background, shadow, and a title structure.
+ * @param {object} props - Component props.
+ * @param {string} props.title - The title of the section.
+ * @param {React.ElementType} props.icon - Lucide icon component to display next to the title.
+ * @param {React.ReactNode} props.children - Content of the section.
+ * @param {string} props.id - HTML ID for the section, used for navigation and ARIA.
+ * @param {string} [props.titleClassName="text-3xl sm:text-4xl"] - Optional CSS classes for the title.
+ */
 const Section = ({
   title,
-  icon: IconComponent,
+  icon: IconComponent, // Destructure and rename 'icon' prop to 'IconComponent'.
   children,
   id,
-  titleClassName = "text-3xl sm:text-4xl",
+  titleClassName = "text-3xl sm:text-4xl", // Default styling for the title.
 }) => (
+  // Using <section> HTML5 semantic tag for better document structure and SEO.
   <section
-    id={id}
+    id={id} // HTML ID for direct navigation (e.g., #about).
     className="py-16 md:py-20 bg-white dark:bg-slate-800/80 rounded-xl shadow-xl dark:shadow-black/30 mb-12 md:mb-16 px-6 md:px-10"
+    // ARIA attribute to associate the section with its title for accessibility.
     aria-labelledby={`${id}-title`}
   >
     <div className="container mx-auto">
+      {" "}
+      {/* Centering content with a max-width. */}
+      {/* Section Title */}
       <h2
-        id={`${id}-title`}
+        id={`${id}-title`} // ID for the ARIA association.
         className={`${titleClassName} font-medium text-emerald-700 dark:text-emerald-400 mb-10 md:mb-14 text-center flex items-center justify-center`}
       >
+        {/* Conditionally render the icon if provided. */}
         {IconComponent && (
           <IconComponent
             className="w-8 h-8 sm:w-10 sm:h-10 mr-3 text-emerald-500 dark:text-emerald-400"
             strokeWidth={2}
-            aria-hidden="true"
+            aria-hidden="true" // Decorative icon, so hide from screen readers.
           />
         )}
         {title}
       </h2>
+      {/* Content of the section. */}
       {children}
     </div>
   </section>
 );
 
+/**
+ * ProjectCard Component: Displays details for a single project, typically used for Blender art or code projects.
+ * Includes an image, title, description, artistic statement (optional), and an image gallery.
+ * @param {object} props - Component props.
+ * @param {string} props.title - Project title.
+ * @param {string} props.description - Project description.
+ * @param {string} [props.artisticStatement] - Optional artistic statement or additional context.
+ * @param {string} props.mainImage - URL for the main project image.
+ * @param {string[]} props.galleryImages - Array of URLs for gallery images.
+ * @param {string} [props.imagePlaceholderColor] - Background color for image placeholder if image fails to load.
+ * @param {string} [props.link] - Optional external link for the project.
+ * @param {string} props.type - Type of project (e.g., "blender", "code"), can influence styling or icons.
+ * @param {boolean} props.isGalleryOpen - State indicating if the image gallery is expanded.
+ * @param {function} props.onToggleGallery - Callback function to toggle gallery visibility.
+ */
 const ProjectCard = ({
   title,
   description,
@@ -171,46 +257,65 @@ const ProjectCard = ({
   isGalleryOpen,
   onToggleGallery,
 }) => {
+  // State for expanding/collapsing the description text.
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  // State for the currently displayed image index in the gallery.
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Toggles the 'isDescriptionExpanded' state.
   const toggleDescription = () =>
     setIsDescriptionExpanded(!isDescriptionExpanded);
+
+  // Moves to the next image in the gallery.
   const nextImage = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent card click or other underlying events.
     if (galleryImages && galleryImages.length > 0)
-      setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+      setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length); // Loop back to start.
   };
+
+  // Moves to the previous image in the gallery.
   const prevImage = (e) => {
     e.stopPropagation();
     if (galleryImages && galleryImages.length > 0)
       setCurrentImageIndex(
-        (prev) => (prev - 1 + galleryImages.length) % galleryImages.length,
+        (prev) => (prev - 1 + galleryImages.length) % galleryImages.length, // Loop back to end.
       );
   };
+
+  // Effect to reset the gallery to the first image when it's closed.
   useEffect(() => {
-    if (type === "blender" && !isGalleryOpen) setCurrentImageIndex(0);
-  }, [isGalleryOpen, type]);
+    if (type === "blender" && !isGalleryOpen) {
+      setCurrentImageIndex(0);
+    }
+  }, [isGalleryOpen, type]); // Dependencies: runs when gallery visibility or type changes.
+
+  // Error handler for images. If an image fails to load, it shows a placeholder.
   const imageErrorHandler = (e) => {
-    e.target.onerror = null;
+    e.target.onerror = null; // Prevents an infinite loop if the placeholder image also fails.
     e.target.src = `https://placehold.co/600x400/E0E0E0/BDBDBD?text=Image+Not+Found`;
   };
 
   return (
+    // Using <article> HTML5 semantic tag for self-contained content, beneficial for SEO.
     <article className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
+      {/* Main project image or placeholder */}
       {type === "blender" && mainImage ? (
         <img
           src={mainImage}
+          // SEO: Descriptive alt text, marked for review.
           alt={`Main image for ${title} - ${type} project [Review and finalize description]`}
           className="w-full h-52 md:h-60 rounded-md object-cover mb-5 shadow-sm"
-          onError={imageErrorHandler}
-          loading="lazy"
+          onError={imageErrorHandler} // Fallback for broken images.
+          loading="lazy" // SEO: Lazy load images below the fold for better performance.
         />
       ) : (
+        // Placeholder if no image is available or if it's not a Blender project with a main image.
         <div
           className={`w-full h-52 md:h-60 rounded-md flex items-center justify-center text-white dark:text-slate-300 text-xl font-semibold mb-5 ${imagePlaceholderColor || "bg-gray-300 dark:bg-slate-700"}`}
-          role="img"
-          aria-label={`${title} project placeholder image`}
+          role="img" // Accessibility: Indicate this div acts as an image.
+          aria-label={`${title} project placeholder image`} // Accessibility: Provide a label for the placeholder.
         >
+          {/* Display different icons based on the project type. */}
           {type === "blender" ? (
             <Palette size={52} strokeWidth={1.5} aria-hidden="true" />
           ) : (
@@ -218,11 +323,18 @@ const ProjectCard = ({
           )}
         </div>
       )}
+
+      {/* Project Title - Using <h3>, assuming it's within a section with an <h2>. */}
       <h3 className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300 mb-3">
         {title}
       </h3>
+
+      {/* Project Description and Artistic Statement */}
       <div className="flex-grow">
+        {" "}
+        {/* Ensures this part takes available space, pushing buttons to the bottom. */}
         <p
+          // Dynamically applies line-clamping if description is not expanded and an artistic statement exists.
           className={`text-gray-700 dark:text-slate-300 text-sm md:text-base mb-2 ${isDescriptionExpanded || !artisticStatement ? "" : "line-clamp-3"}`}
         >
           {description}
@@ -235,12 +347,14 @@ const ProjectCard = ({
           </p>
         )}
       </div>
+
+      {/* "Show More/Less" button for long descriptions. */}
       {(description.length > 100 ||
         (artisticStatement && artisticStatement.length > 50)) && (
         <button
           onClick={toggleDescription}
           className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center mb-4 text-sm font-medium self-start uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
-          aria-expanded={isDescriptionExpanded}
+          aria-expanded={isDescriptionExpanded} // Accessibility: Indicates expanded state.
         >
           {isDescriptionExpanded ? "Show Less" : "Show More"}
           {isDescriptionExpanded ? (
@@ -250,7 +364,12 @@ const ProjectCard = ({
           )}
         </button>
       )}
+
+      {/* Action buttons (View Gallery, View Project) */}
       <div className="mt-auto">
+        {" "}
+        {/* Pushes these buttons to the bottom of the card. */}
+        {/* "View/Hide Images" button for Blender projects with galleries. */}
         {type === "blender" &&
           galleryImages &&
           galleryImages.length > 0 &&
@@ -258,7 +377,8 @@ const ProjectCard = ({
             <button
               onClick={onToggleGallery}
               className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start mr-4 text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
-              aria-expanded={isGalleryOpen}
+              aria-expanded={isGalleryOpen} // Accessibility: Indicates gallery expanded state.
+              // Accessibility: Controls the gallery element.
               aria-controls={`${title.replace(/\s+/g, "-").toLowerCase()}-gallery`}
             >
               {isGalleryOpen ? "Hide Images" : "View Images"}
@@ -269,33 +389,41 @@ const ProjectCard = ({
               )}
             </button>
           )}
+        {/* Optional external link for the project. */}
         {link && (
           <a
             href={link}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer" // Security for external links.
             className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
           >
             View Project <ExternalLink size={16} className="ml-1.5" />
           </a>
         )}
       </div>
+
+      {/* Image Gallery (conditionally rendered) */}
       {type === "blender" &&
         isGalleryOpen &&
         galleryImages &&
         galleryImages.length > 0 && (
+          // ID for ARIA controls.
           <div
             id={`${title.replace(/\s+/g, "-").toLowerCase()}-gallery`}
             className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700"
           >
             <div className="relative mb-2">
+              {" "}
+              {/* Relative positioning for arrow buttons. */}
               <img
                 src={galleryImages[currentImageIndex]}
+                // SEO: Descriptive alt text for gallery images, marked for review.
                 alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length} [Review and finalize description]`}
                 className="w-full h-60 md:h-72 rounded-md object-cover shadow-inner bg-gray-100 dark:bg-slate-700"
                 onError={imageErrorHandler}
-                loading="lazy"
+                loading="lazy" // SEO: Lazy load gallery images.
               />
+              {/* Navigation buttons for the gallery (if more than one image). */}
               {galleryImages.length > 1 && (
                 <>
                   <button
@@ -315,6 +443,7 @@ const ProjectCard = ({
                 </>
               )}
             </div>
+            {/* Image counter for the gallery. */}
             {galleryImages.length > 1 && (
               <p className="text-center text-xs text-gray-600 dark:text-slate-400">
                 Image {currentImageIndex + 1} of {galleryImages.length}
@@ -327,8 +456,20 @@ const ProjectCard = ({
 };
 
 // --- Page Sections ---
+// These components define the major content areas of the portfolio.
+
+/**
+ * Navbar Component: Site navigation bar, sticky at the top.
+ * Includes branding, navigation links, and a dark mode toggle.
+ * @param {object} props - Component props.
+ * @param {function} props.setActiveSection - Callback to set the currently active section for scrolling.
+ * @param {function} props.toggleDarkMode - Callback to toggle dark mode.
+ * @param {boolean} props.isDarkMode - Current dark mode state.
+ */
 const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
+  // State for controlling the visibility of the mobile menu.
   const [isOpen, setIsOpen] = useState(false);
+  // Array of navigation links with their IDs (for href) and labels.
   const navLinks = [
     { id: "home", label: "Home" },
     { id: "about", label: "About" },
@@ -340,69 +481,82 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
     { id: "cli", label: "CLI Tools" },
     { id: "contact", label: "Contact" },
   ];
+
+  // Framer Motion animation variants for hover effects on nav links and brand.
   const navLinkHoverAnimation = {
-    rotate: [0, -1.5, 1.5, -1.5, 1.5, 0],
-    scale: 1.03,
+    rotate: [0, -1.5, 1.5, -1.5, 1.5, 0], // Subtle rotation.
+    scale: 1.03, // Slight scale up.
     transition: { duration: 0.35, ease: "easeInOut" },
   };
   const brandHoverAnimation = {
-    scale: [1, 1.02, 1, 1.02, 1],
-    color: isDarkMode
-      ? ["#e2e8f0", "#6ee7b7", "#e2e8f0"]
-      : ["#FFFFFF", "#A7F3D0", "#FFFFFF"],
+    scale: [1, 1.02, 1, 1.02, 1], // Pulsing scale.
+    color: isDarkMode // Dynamic color change based on dark mode.
+      ? ["#e2e8f0", "#6ee7b7", "#e2e8f0"] // slate-200, emerald-300, slate-200
+      : ["#FFFFFF", "#A7F3D0", "#FFFFFF"], // white, emerald-200, white
     transition: { duration: 0.5, ease: "easeInOut" },
   };
 
   return (
+    // Using <nav> HTML5 semantic tag for the main navigation structure.
     <nav
       className="bg-emerald-600 dark:bg-slate-800 text-white sticky top-0 z-50 shadow-lg dark:shadow-black/30"
       aria-label="Main navigation"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {" "}
+          {/* Main navbar container. */}
+          {/* Left side: Profile picture and Brand name/link. */}
           <div className="flex items-center">
             <motion.img
               src={profilePic}
+              // SEO: Descriptive alt text, marked for review.
               alt="Filipe L. Q. Junqueira - Profile Picture [Review and finalize description]"
               className="w-10 h-10 rounded-full mr-3 object-cover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
-              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileHover={{ scale: 1.1, rotate: 5 }} // Hover animation for the image.
               transition={{ type: "spring", stiffness: 300 }}
-              loading="lazy"
+              loading="lazy" // SEO: Can be lazy as it's small and repeated.
             />
             <motion.a
-              href="#home"
-              onClick={() => setActiveSection("home")}
+              href="#home" // Links to the top of the page.
+              onClick={() => setActiveSection("home")} // Sets 'home' as the active section.
               className="flex-shrink-0 text-xl md:text-2xl font-medium focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 rounded-sm"
-              whileHover={brandHoverAnimation}
+              whileHover={brandHoverAnimation} // Hover animation for the brand name.
             >
               Filipe L. Q. Junqueira
             </motion.a>
           </div>
+          {/* Right side: Desktop navigation links and dark mode toggle. */}
           <div className="hidden md:flex items-center">
+            {" "}
+            {/* Hidden on small screens. */}
             <div className="ml-10 flex items-baseline space-x-1">
+              {/* Map through navLinks to create navigation items. */}
               {navLinks.map((link) => (
                 <motion.a
                   key={link.id}
-                  href={`#${link.id}`}
+                  href={`#${link.id}`} // Anchor link to the section ID.
                   onClick={() => {
-                    setActiveSection(link.id);
-                    setIsOpen(false);
+                    setActiveSection(link.id); // Set active section for scrolling.
+                    setIsOpen(false); // Close mobile menu if it was open.
                   }}
                   className="hover:bg-emerald-700/50 dark:hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
-                  whileHover={navLinkHoverAnimation}
+                  whileHover={navLinkHoverAnimation} // Hover animation.
                 >
                   {link.label}
                 </motion.a>
               ))}
             </div>
+            {/* Dark Mode Toggle Button (Desktop) */}
             <motion.button
               onClick={toggleDarkMode}
               className="ml-6 p-2 rounded-full hover:bg-emerald-700/50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-slate-300 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800 transition-colors duration-200"
+              // Accessibility: Dynamic aria-label based on current mode.
               aria-label={
                 isDarkMode ? "Switch to light mode" : "Switch to dark mode"
               }
-              whileHover={{ scale: 1.15, rotate: isDarkMode ? -15 : 15 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.15, rotate: isDarkMode ? -15 : 15 }} // Hover animation.
+              whileTap={{ scale: 0.9 }} // Tap animation.
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
               {isDarkMode ? (
@@ -412,7 +566,9 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
               )}
             </motion.button>
           </div>
+          {/* Mobile Menu Button and Dark Mode Toggle (visible on small screens) */}
           <div className="-mr-2 flex md:hidden items-center">
+            {/* Dark Mode Toggle Button (Mobile) */}
             <motion.button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-emerald-100 dark:text-slate-300 hover:text-white dark:hover:text-white hover:bg-emerald-700/50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-slate-300 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800 mr-2"
@@ -429,14 +585,17 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
                 <Moon size={22} aria-hidden="true" />
               )}
             </motion.button>
+            {/* Hamburger Menu Button */}
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsOpen(!isOpen)} // Toggles mobile menu visibility.
               type="button"
               className="bg-emerald-700 dark:bg-slate-700/50 inline-flex items-center justify-center p-2 rounded-md text-emerald-100 hover:text-white hover:bg-emerald-600 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-700 dark:focus:ring-offset-slate-800 focus:ring-white"
-              aria-controls="mobile-menu"
-              aria-expanded={isOpen}
+              aria-controls="mobile-menu" // Associates button with the mobile menu content.
+              aria-expanded={isOpen} // Indicates if the menu is open or closed.
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">Open main menu</span>{" "}
+              {/* For screen readers. */}
+              {/* Dynamically display hamburger or close icon. */}
               {!isOpen ? (
                 <svg
                   className="block h-6 w-6"
@@ -474,8 +633,12 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
           </div>
         </div>
       </div>
-      {isOpen && (
+
+      {/* Mobile Menu (Dropdown) */}
+      {isOpen && ( // Conditionally render if 'isOpen' is true.
         <div className="md:hidden" id="mobile-menu">
+          {" "}
+          {/* ID for ARIA association. */}
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navLinks.map((link) => (
               <motion.a
@@ -483,7 +646,7 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
                 href={`#${link.id}`}
                 onClick={() => {
                   setActiveSection(link.id);
-                  setIsOpen(false);
+                  setIsOpen(false); // Close menu after clicking a link.
                 }}
                 className="hover:bg-emerald-700/50 dark:hover:bg-slate-700 block px-3 py-2 rounded-md text-base font-medium tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
                 whileHover={navLinkHoverAnimation}
@@ -498,29 +661,38 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
   );
 };
 
+/**
+ * HeroSection Component: The main landing/introduction section at the top of the page.
+ * Typically contains the main heading (H1), a short bio, and a call to action (e.g., View CV).
+ */
 const HeroSection = () => (
+  // Using <header> HTML5 semantic tag as this is the primary introduction.
+  // It could also be a <section> if <Navbar> is considered the main <header>.
   <header
-    id="home"
+    id="home" // ID for navigation.
     className="bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-slate-800 dark:to-slate-900 text-white py-24 md:py-32"
-    aria-labelledby="main-heading"
+    aria-labelledby="main-heading" // Associates this landmark with its main heading for accessibility.
   >
     <div className="container mx-auto text-center px-6 flex flex-col items-center">
       <motion.img
         src={profilePic}
+        // SEO: Descriptive alt text, marked for review. Critical for this prominent image.
         alt="Filipe L. Q. Junqueira - Main Profile Picture [Review and finalize description]"
         className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover mb-8 shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
+        // Framer Motion animation properties.
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{
           duration: 0.5,
           delay: 0.2,
-          type: "spring",
+          type: "spring", // Spring animation for a bouncier feel.
           stiffness: 120,
         }}
-        loading="eager"
+        loading="eager" // SEO: Eager load critical, above-the-fold images.
       />
+      {/* SEO: The single most important heading (H1) for the entire page. */}
       <motion.h1
-        id="main-heading"
+        id="main-heading" // ID for ARIA association.
         className="text-4xl sm:text-5xl md:text-6xl font-light mb-6 dark:text-slate-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -528,6 +700,7 @@ const HeroSection = () => (
       >
         Filipe L. Q. Junqueira
       </motion.h1>
+      {/* Sub-heading or tagline. */}
       <motion.p
         className="text-lg sm:text-xl md:text-2xl font-normal mb-4 text-emerald-100 dark:text-slate-300 opacity-95"
         initial={{ opacity: 0, y: 20 }}
@@ -537,6 +710,7 @@ const HeroSection = () => (
         Research Associate, School of Physics and Astronomy, University of
         Nottingham
       </motion.p>
+      {/* Brief introductory paragraph. */}
       <motion.p
         className="text-base sm:text-lg md:text-xl mb-10 text-emerald-200 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed"
         initial={{ opacity: 0, y: 20 }}
@@ -546,14 +720,16 @@ const HeroSection = () => (
         Exploring 3D printing with atoms, NC-AFM & STM studies, DFT, and Machine
         Learning in nanoscience.
       </motion.p>
+      {/* Call to action button to view the CV. */}
       <motion.a
-        href={filipeCv}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={filipeCv} // Links to the imported CV PDF.
+        target="_blank" // Opens link in a new tab.
+        rel="noopener noreferrer" // Security measure for target="_blank".
         className="bg-white text-emerald-600 dark:bg-emerald-500 dark:text-white font-medium py-3 px-8 rounded-md text-base uppercase tracking-wider hover:bg-emerald-50 dark:hover:bg-emerald-600 transition-colors duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-300 focus:ring-offset-white dark:focus:ring-offset-emerald-500"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 1.0 }}
+        // Hover animation for the button.
         whileHover={{
           scale: 1.05,
           rotate: [0, -1, 1, -1, 1, 0],
@@ -567,7 +743,11 @@ const HeroSection = () => (
   </header>
 );
 
+/**
+ * AboutMeSection Component: Contains a narrative or biographical information.
+ */
 const AboutMeSection = () => {
+  // Array of paragraphs for the "About Me" narrative.
   const aboutMeNarrative = [
     "Driven by an insatiable curiosity for the quantum realm and a passion for computational problem-solving, I thrive at the intersection of nanoscience, data science, and creative technology.",
     "My journey has taken me from fundamental physics research and complex simulations to crafting intuitive command-line tools and exploring the artistic potential of 3D visualization.",
@@ -575,19 +755,24 @@ const AboutMeSection = () => {
     "I'm always eager to connect with fellow innovators and explore opportunities where my diverse skill set can contribute to impactful projects and new discoveries.",
   ];
   return (
+    // Uses the reusable Section component for consistent styling.
     <Section
       title="About Me"
-      icon={User}
-      id="about"
-      titleClassName="text-3xl sm:text-4xl md:text-5xl"
+      icon={User} // User icon for this section.
+      id="about" // HTML ID for navigation.
+      titleClassName="text-3xl sm:text-4xl md:text-5xl" // Custom title size.
     >
       <div className="max-w-3xl mx-auto space-y-5">
+        {" "}
+        {/* Content container. */}
+        {/* Map through the narrative paragraphs and render them with animation. */}
         {aboutMeNarrative.map((paragraph, index) => (
           <motion.p
-            key={index}
+            key={index} // Unique key for each paragraph.
             className="text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed text-center md:text-left"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
+            // Staggered animation delay for each paragraph.
             transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
           >
             {paragraph}
@@ -598,7 +783,11 @@ const AboutMeSection = () => {
   );
 };
 
+/**
+ * SkillsSection Component: Displays various skills categorized into groups.
+ */
 const SkillsSection = () => {
+  // Data object containing skills categorized into computer skills, scientific tools, and languages.
   const skillsData = {
     computerSkills: [
       { name: "Python", icon: Code },
@@ -633,22 +822,29 @@ const SkillsSection = () => {
     ],
   };
 
+  /**
+   * SkillItem Component: Renders a single skill item with an icon and optional proficiency level.
+   * @param {object} props - Component props.
+   * @param {string} props.name - Name of the skill.
+   * @param {React.ElementType} props.icon - Lucide icon component for the skill.
+   * @param {string} [props.proficiency] - Optional proficiency level string.
+   */
   const SkillItem = ({ name, icon: Icon, proficiency }) => (
     <motion.li
       className="bg-emerald-50 dark:bg-slate-700/50 p-3 rounded-lg shadow-sm flex items-center space-x-3 hover:shadow-md transition-shadow"
-      whileHover={{ y: -3 }}
+      whileHover={{ y: -3 }} // Subtle lift animation on hover.
     >
       {Icon && (
         <Icon
           className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0"
           strokeWidth={2}
-          aria-hidden="true"
+          aria-hidden="true" // Decorative icon.
         />
       )}
       <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
         {name}
       </span>
-      {proficiency && (
+      {proficiency && ( // Display proficiency if available.
         <span className="text-xs text-gray-500 dark:text-slate-400 ml-auto">
           ({proficiency})
         </span>
@@ -658,8 +854,11 @@ const SkillsSection = () => {
 
   return (
     <Section title="Core Competencies & Skills" icon={Lightbulb} id="skills">
+      {/* Grid layout for skill categories. */}
       <div className="grid md:grid-cols-3 gap-10">
+        {/* Computer Skills Column */}
         <div>
+          {/* Sub-section heading (H3). */}
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <HardDrive
               className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400"
@@ -668,13 +867,18 @@ const SkillsSection = () => {
             Computer Skills
           </h3>
           <ul className="space-y-3">
+            {" "}
+            {/* List of skills. */}
             {skillsData.computerSkills.map((skill, index) => (
+              // Each skill item is wrapped in AnimatedSection for scroll animation.
               <AnimatedSection key={index} delay={index * 0.05} threshold={0.1}>
                 <SkillItem name={skill.name} icon={skill.icon} />
               </AnimatedSection>
             ))}
           </ul>
         </div>
+
+        {/* Scientific Software & Tools Column */}
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <Atom
@@ -691,6 +895,8 @@ const SkillsSection = () => {
             ))}
           </ul>
         </div>
+
+        {/* Languages Column */}
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <Globe
@@ -705,7 +911,7 @@ const SkillsSection = () => {
                 <SkillItem
                   name={lang.name}
                   proficiency={lang.proficiency}
-                  icon={MessageSquare}
+                  icon={MessageSquare} // Using a generic icon for languages.
                 />
               </AnimatedSection>
             ))}
@@ -716,7 +922,11 @@ const SkillsSection = () => {
   );
 };
 
+/**
+ * TeachingSection Component: Details teaching and tutoring experience.
+ */
 const TeachingSection = () => {
+  // Array of key points about teaching experience.
   const teachingPoints = [
     "Extensive experience tutoring students for International Mathematics Olympiads (IMO), focusing on advanced problem-solving techniques in Number Theory, Combinatorics, Algebra, and Geometry.",
     "Provided tailored coaching for IB (International Baccalaureate) Mathematics (HL/SL) and Physics (HL/SL), helping students achieve top grades and develop a deep understanding of core concepts.",
@@ -739,13 +949,14 @@ const TeachingSection = () => {
           competitions and rigorous academic programs.
         </motion.p>
 
+        {/* List of teaching points. */}
         <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-slate-300 text-base md:text-lg">
           {teachingPoints.map((point, index) => (
             <motion.li
               key={index}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -20 }} // Animates in from the left.
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+              transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }} // Staggered delay.
               className="ml-4"
             >
               {point}
@@ -753,17 +964,18 @@ const TeachingSection = () => {
           ))}
         </ul>
 
+        {/* Link to external tutoring site. */}
         <motion.div
           className="text-center mt-8"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: 0.5,
-            delay: 0.3 + teachingPoints.length * 0.1,
+            delay: 0.3 + teachingPoints.length * 0.1, // Delay after list items animate.
           }}
         >
           <a
-            href="http://filipej.com"
+            href="http://filipej.com" // Ensure this link is correct.
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
@@ -776,8 +988,13 @@ const TeachingSection = () => {
   );
 };
 
+/**
+ * BlenderCreations Component: Showcases Blender 3D art projects using ProjectCard.
+ */
 const BlenderCreations = () => {
+  // State to manage which project's gallery is currently expanded.
   const [expandedGalleryId, setExpandedGalleryId] = useState(null);
+  // Array of Blender project data.
   const blenderProjects = [
     {
       id: 1,
@@ -810,8 +1027,11 @@ const BlenderCreations = () => {
       galleryImages: [blenderC1, blenderC2, blenderC3],
     },
   ];
+
+  // Toggles the expanded state of a project's gallery.
   const handleToggleGallery = (projectId) =>
     setExpandedGalleryId((prevId) => (prevId === projectId ? null : projectId));
+
   return (
     <Section title="Blender Art & 3D Visualization" icon={Palette} id="blender">
       <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
@@ -820,18 +1040,20 @@ const BlenderCreations = () => {
         narrative, aiming to bridge the gap between the technical and the
         aesthetic.
       </p>
+      {/* Grid layout for Blender project cards. */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
         {blenderProjects.map((project, index) => (
+          // Each project card is animated.
           <AnimatedSection
             key={project.id}
-            delay={index * 0.15}
+            delay={index * 0.15} // Staggered animation.
             threshold={0.1}
           >
             <ProjectCard
-              {...project}
-              type="blender"
-              isGalleryOpen={expandedGalleryId === project.id}
-              onToggleGallery={() => handleToggleGallery(project.id)}
+              {...project} // Spread project data as props.
+              type="blender" // Specify project type.
+              isGalleryOpen={expandedGalleryId === project.id} // Pass gallery open state.
+              onToggleGallery={() => handleToggleGallery(project.id)} // Pass toggle handler.
             />
           </AnimatedSection>
         ))}
@@ -844,7 +1066,11 @@ const BlenderCreations = () => {
   );
 };
 
+/**
+ * CLIToolsSection Component: Highlights command-line interface tools developed.
+ */
 const CLIToolsSection = () => {
+  // Data for CLI tools.
   const cliToolsData = [
     {
       id: 1,
@@ -1015,19 +1241,24 @@ const CLIToolsSection = () => {
       githubLink: "https://github.com/filipejunqueira/quickplot",
     },
   ];
+
+  // Animation variants for the CLI tool cards.
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i) => ({
+      // `i` is a custom prop for staggering.
       opacity: 1,
       y: 0,
       transition: { delay: i * 0.12, duration: 0.5, ease: "easeInOut" },
     }),
     hover: {
+      // Hover state animation.
       y: -6,
       scale: 1.02,
-      boxShadow: "0px 8px 20px rgba(16, 185, 129, 0.12)",
+      boxShadow: "0px 8px 20px rgba(16, 185, 129, 0.12)", // Emerald shadow.
     },
   };
+
   return (
     <Section title="CLI Tools & Scripts" icon={Terminal} id="cli">
       <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
@@ -1037,24 +1268,26 @@ const CLIToolsSection = () => {
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
         {cliToolsData.map((tool, index) => {
-          const ToolIcon = tool.icon;
+          const ToolIcon = tool.icon; // Dynamically render the icon specified in data.
           return (
+            // Using <motion.article> for semantic structure and animation.
             <motion.article
               key={tool.id}
               className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col cursor-default"
               variants={cardVariants}
               initial="hidden"
-              whileInView="visible"
-              whileHover="hover"
-              viewport={{ once: true, amount: 0.1 }}
-              custom={index}
-              aria-labelledby={`cli-tool-title-${tool.id}`}
+              whileInView="visible" // Animate when the card scrolls into view.
+              whileHover="hover" // Apply hover animation.
+              viewport={{ once: true, amount: 0.1 }} // Intersection observer options.
+              custom={index} // Pass index to `visible` variant for staggered animation.
+              aria-labelledby={`cli-tool-title-${tool.id}`} // Accessibility.
             >
               <div className="flex items-center text-emerald-600 dark:text-emerald-400 mb-4">
                 <ToolIcon
                   className="h-9 w-9 mr-3.5 stroke-[1.75] flex-shrink-0"
                   aria-hidden="true"
                 />
+                {/* CLI Tool Title (H3) */}
                 <h3
                   id={`cli-tool-title-${tool.id}`}
                   className="text-lg lg:text-xl font-medium text-emerald-800 dark:text-emerald-300"
@@ -1071,6 +1304,7 @@ const CLIToolsSection = () => {
                   {tool.problemSolved}
                 </p>
               )}
+              {/* Tags for the CLI tool. */}
               <div className="mb-5 flex flex-wrap gap-2">
                 {tool.tags.map((tag) => (
                   <span
@@ -1081,15 +1315,18 @@ const CLIToolsSection = () => {
                   </span>
                 ))}
               </div>
+              {/* Simulated code example. */}
               {tool.codeExample && (
                 <div className="bg-gray-800 dark:bg-slate-900/80 p-4 rounded-lg font-mono text-xs mb-5 overflow-x-auto shadow-inner">
+                  {/* Using <pre> for preformatted text, good for code examples. */}
                   <pre className="whitespace-pre-wrap leading-relaxed text-sm">
                     {tool.codeExample}
                   </pre>
                 </div>
               )}
+              {/* Link to GitHub repository. */}
               <motion.a
-                href={tool.githubLink || "https://github.com/filipejunqueira"}
+                href={tool.githubLink || "https://github.com/filipejunqueira"} // Fallback link.
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-5 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
@@ -1109,8 +1346,13 @@ const CLIToolsSection = () => {
   );
 };
 
+/**
+ * ScientistCareer Component: Details career milestones and educational background.
+ */
 const ScientistCareer = () => {
+  // State to track which career milestone's details are expanded.
   const [expandedDetailId, setExpandedDetailId] = useState(null);
+  // Array of career and education milestones.
   const careerMilestones = [
     {
       id: 1,
@@ -1223,10 +1465,13 @@ const ScientistCareer = () => {
       - Developed a deeper understanding of mathematical proofs, abstract structures, and their applications in other scientific fields.`,
     },
   ];
+
+  // Toggles the expanded state for a specific milestone's details.
   const handleToggleDetail = (milestoneId) =>
     setExpandedDetailId((prevId) =>
       prevId === milestoneId ? null : milestoneId,
     );
+
   return (
     <Section title="Career & Education" icon={Briefcase} id="scientist">
       <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
@@ -1235,15 +1480,18 @@ const ScientistCareer = () => {
         towards new discoveries and innovations.
       </p>
       <div className="space-y-8">
+        {" "}
+        {/* Container for milestones. */}
         {careerMilestones.map((milestone, index) => {
           const MilestoneIcon = milestone.icon;
-          const isExpanded = expandedDetailId === milestone.id;
+          const isExpanded = expandedDetailId === milestone.id; // Check if current milestone is expanded.
           return (
             <AnimatedSection
               key={milestone.id}
-              delay={index * 0.1}
-              threshold={0.05}
+              delay={index * 0.1} // Staggered animation.
+              threshold={0.05} // Trigger animation when 5% is visible.
             >
+              {/* Using <article> for each career milestone. */}
               <article
                 className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60 dark:border dark:border-slate-700"
                 aria-labelledby={`career-title-${milestone.id}`}
@@ -1258,6 +1506,7 @@ const ScientistCareer = () => {
                     )}
                   </div>
                   <div className="flex-grow">
+                    {/* Milestone Title (H3) */}
                     <h3
                       id={`career-title-${milestone.id}`}
                       className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300"
@@ -1273,12 +1522,13 @@ const ScientistCareer = () => {
                     <p className="text-gray-700 dark:text-slate-300 leading-relaxed text-base">
                       {milestone.description}
                     </p>
+                    {/* "View More/Less" button for milestones with extra details. */}
                     {milestone.moreDetails && (
                       <button
                         onClick={() => handleToggleDetail(milestone.id)}
                         className="mt-4 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium inline-flex items-center uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
-                        aria-expanded={isExpanded}
-                        aria-controls={`career-details-${milestone.id}`}
+                        aria-expanded={isExpanded} // Accessibility.
+                        aria-controls={`career-details-${milestone.id}`} // Accessibility.
                       >
                         {isExpanded ? "Show Less" : "View More"}
                         {isExpanded ? (
@@ -1298,15 +1548,17 @@ const ScientistCareer = () => {
                     )}
                   </div>
                 </div>
+                {/* Collapsible section for additional details. */}
                 {isExpanded && milestone.moreDetails && (
                   <motion.div
-                    id={`career-details-${milestone.id}`}
+                    id={`career-details-${milestone.id}`} // For ARIA controls.
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                     className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700"
                   >
+                    {/* `whitespace-pre-line` preserves line breaks from the `moreDetails` string. */}
                     <p className="text-gray-700 dark:text-slate-300 leading-relaxed text-sm whitespace-pre-line">
                       {milestone.moreDetails}
                     </p>
@@ -1321,69 +1573,92 @@ const ScientistCareer = () => {
   );
 };
 
+/**
+ * PublicationItem Component: Displays a single publication with an option to get an AI-generated explanation.
+ * @param {object} props - Component props.
+ * @param {object} props.pub - Publication data object.
+ */
 const PublicationItem = ({ pub }) => {
+  // State for storing the AI-generated summary.
   const [summary, setSummary] = useState("");
+  // State to indicate if the summary is currently being loaded.
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+  // State for storing any error messages during summary generation.
   const [summaryError, setSummaryError] = useState("");
+  // State to control the visibility of the summary/explanation area.
   const [showSummary, setShowSummary] = useState(false);
 
+  // Async function to handle the generation of the AI summary.
   const handleGenerateSummary = async () => {
+    // If summary exists and is hidden, just show it.
     if (summary && !showSummary) {
       setShowSummary(true);
       return;
     }
+    // If summary is shown, hide it.
     if (showSummary && summary) {
       setShowSummary(false);
       return;
     }
 
+    // Start loading state.
     setIsLoadingSummary(true);
     setSummaryError("");
-    setSummary("");
-    setShowSummary(true);
+    setSummary(""); // Clear any previous summary.
+    setShowSummary(true); // Make the summary area visible (for loader/error/content).
 
+    // Construct the prompt for the Gemini API.
     const prompt = `Please provide a concise summary or explain the significance of the following scientific publication in 2-3 sentences, suitable for a general audience. Focus on the key findings or impact:\nTitle: "${pub.title}"\nAuthors: ${pub.authors}\nJournal: ${pub.journal}\nYear: ${pub.year}\n${pub.note ? `Note: ${pub.note}` : ""}\nWhat are the main takeaways or importance of this research?`;
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKeyGen = "";
+    const apiKeyGen = ""; // IMPORTANT: API Key should be handled securely, typically via environment variables, not hardcoded.
+    // This empty string is a placeholder. The actual key might be injected by the environment.
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyGen}`;
 
     try {
+      // Make the API request.
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      // Handle non-successful responses.
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json(); // Try to parse error details from API.
         console.error("Gemini API Error:", errorData);
         throw new Error(
           `API request failed: ${errorData?.error?.message || response.status}`,
         );
       }
-      const result = await response.json();
+      const result = await response.json(); // Parse successful response.
+      // Extract the summary text from the API response.
       if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
         setSummary(result.candidates[0].content.parts[0].text);
       } else {
+        // Handle cases where the response structure is not as expected.
         console.error("Unexpected API response structure:", result);
         throw new Error("Failed to extract summary from API response.");
       }
     } catch (error) {
+      // Handle any errors during the fetch or processing.
       console.error("Summary generation error:", error);
       setSummaryError(
         error.message ||
           "An unknown error occurred while generating the summary.",
       );
     } finally {
+      // Ensure loading state is turned off regardless of success or failure.
       setIsLoadingSummary(false);
     }
   };
 
   return (
+    // Using <article> for each publication item.
     <article
       className="bg-emerald-50 dark:bg-slate-800 p-5 rounded-lg shadow-md hover:shadow-lg dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-shadow duration-300"
       aria-labelledby={`pub-title-${pub.id}`}
     >
+      {/* Publication Title (H3) */}
       <h3
         id={`pub-title-${pub.id}`}
         className="text-lg md:text-xl font-medium text-emerald-800 dark:text-emerald-300 mb-1.5"
@@ -1391,16 +1666,19 @@ const PublicationItem = ({ pub }) => {
         {pub.title}
       </h3>
       <p className="text-sm text-gray-700 dark:text-slate-400 italic mb-1 truncate-authors">
+        {" "}
+        {/* Truncate long author lists visually. */}
         {pub.authors}
       </p>
       <p className="text-sm text-emerald-700 dark:text-emerald-400 mb-1">
         {pub.journal} ({pub.year})
       </p>
-      {pub.note && (
+      {pub.note && ( // Display note if available.
         <p className="text-xs text-gray-600 dark:text-slate-500 mb-3">
           {pub.note}
         </p>
       )}
+      {/* Action buttons: View Publication and AI Explanation. */}
       <div className="flex flex-wrap items-center space-x-4 mt-3">
         <a
           href={pub.link}
@@ -1413,12 +1691,14 @@ const PublicationItem = ({ pub }) => {
         </a>
         <button
           onClick={handleGenerateSummary}
-          disabled={isLoadingSummary}
+          disabled={isLoadingSummary} // Disable button while loading.
           className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
-          aria-controls={`pub-summary-${pub.id}`}
-          aria-expanded={showSummary}
+          aria-controls={`pub-summary-${pub.id}`} // Associates button with the summary area.
+          aria-expanded={showSummary} // Indicates if summary is visible.
         >
-          <Sparkles size={16} className="mr-1.5" aria-hidden="true" />
+          <Sparkles size={16} className="mr-1.5" aria-hidden="true" />{" "}
+          {/* AI sparkle icon. */}
+          {/* Dynamically change button text based on state. */}
           {isLoadingSummary
             ? "Thinking..."
             : showSummary && summary
@@ -1426,15 +1706,18 @@ const PublicationItem = ({ pub }) => {
               : "✨ Explain with AI"}
         </button>
       </div>
+
+      {/* AI Generated Summary Area (conditionally rendered). */}
       {showSummary && (
         <motion.div
-          id={`pub-summary-${pub.id}`}
+          id={`pub-summary-${pub.id}`} // For ARIA controls.
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
           className="mt-3 pt-3 border-t border-emerald-200 dark:border-slate-700"
         >
+          {/* Loading state display. */}
           {isLoadingSummary && (
             <div className="flex items-center text-sm text-gray-600 dark:text-slate-400">
               <Loader2
@@ -1445,11 +1728,14 @@ const PublicationItem = ({ pub }) => {
               Generating explanation...
             </div>
           )}
+          {/* Error state display. */}
           {summaryError && !isLoadingSummary && (
             <div
               className="flex items-start text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md"
               role="alert"
             >
+              {" "}
+              {/* ARIA role for error messages. */}
               <AlertTriangle
                 size={18}
                 className="mr-2 flex-shrink-0"
@@ -1461,12 +1747,16 @@ const PublicationItem = ({ pub }) => {
               </div>
             </div>
           )}
+          {/* Success state: Display the summary. */}
           {summary && !isLoadingSummary && !summaryError && (
             <div>
+              {/* Summary Title (H4) */}
               <h4 className="text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1">
                 AI Explanation:
               </h4>
               <p className="text-sm text-gray-700 dark:text-slate-300 whitespace-pre-wrap">
+                {" "}
+                {/* `whitespace-pre-wrap` preserves line breaks in the summary. */}
                 {summary}
               </p>
             </div>
@@ -1477,7 +1767,11 @@ const PublicationItem = ({ pub }) => {
   );
 };
 
+/**
+ * PublicationsSection Component: Lists selected scientific publications.
+ */
 const PublicationsSection = () => {
+  // Array of publication data.
   const publications = [
     {
       id: 1,
@@ -1532,7 +1826,10 @@ const PublicationsSection = () => {
         AI" for a quick summary!
       </p>
       <div className="space-y-6">
+        {" "}
+        {/* Container for publication items. */}
         {publications.map((pub, index) => (
+          // Each publication item is animated.
           <AnimatedSection key={pub.id} delay={index * 0.1} threshold={0.05}>
             <PublicationItem pub={pub} />
           </AnimatedSection>
@@ -1542,6 +1839,18 @@ const PublicationsSection = () => {
   );
 };
 
+/**
+ * HoverFlipButton Component: A reusable button with a text/icon flip animation on hover.
+ * @param {object} props - Component props.
+ * @param {string} props.href - URL the button links to.
+ * @param {React.ElementType} props.IconInitial - Lucide icon for the initial state.
+ * @param {string} props.textInitial - Text for the initial state.
+ * @param {string} props.textHover - Text for the hover state.
+ * @param {string} props.bgColorInitial - Tailwind CSS background color class for initial state.
+ * @param {string} props.bgColorHover - Tailwind CSS background color class for hover state (e.g., 'hover:bg-blue-700').
+ * @param {boolean} [props.isExternal=true] - If true, opens link in a new tab with 'noopener noreferrer'.
+ * @param {string} props.ariaLabel - ARIA label for accessibility.
+ */
 const HoverFlipButton = ({
   href,
   IconInitial,
@@ -1552,21 +1861,26 @@ const HoverFlipButton = ({
   isExternal = true,
   ariaLabel,
 }) => {
+  // State to track if the button is currently being hovered over.
   const [isHovered, setIsHovered] = useState(false);
   return (
     <a
       href={href}
-      target={isExternal ? "_blank" : "_self"}
-      rel={isExternal ? "noopener noreferrer" : ""}
+      target={isExternal ? "_blank" : "_self"} // Open in new tab if external.
+      rel={isExternal ? "noopener noreferrer" : ""} // Security for external links.
       className={`flex items-center justify-center font-medium py-2.5 px-5 rounded-md text-white transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105 w-full sm:w-auto min-h-[48px] text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/80 ${bgColorInitial} ${bgColorHover}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      aria-label={ariaLabel || textInitial}
+      onMouseEnter={() => setIsHovered(true)} // Set hover state to true.
+      onMouseLeave={() => setIsHovered(false)} // Set hover state to false.
+      aria-label={ariaLabel || textInitial} // Accessibility: Provides a meaningful label.
     >
+      {/* Container for the flipping animation. */}
       <div className="relative w-full text-center overflow-hidden h-5">
+        {" "}
+        {/* `overflow-hidden` is key for the flip effect. */}
+        {/* Initial Text and Icon (visible by default) */}
         <span
           className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isHovered ? "opacity-0 -translate-y-full" : "opacity-100 translate-y-0"}`}
-          aria-hidden={isHovered}
+          aria-hidden={isHovered} // Hide from screen readers if not visible.
         >
           {IconInitial && (
             <IconInitial
@@ -1575,11 +1889,13 @@ const HoverFlipButton = ({
               aria-hidden="true"
             />
           )}{" "}
-          <span className="truncate">{textInitial}</span>
+          <span className="truncate">{textInitial}</span>{" "}
+          {/* `truncate` prevents text overflow. */}
         </span>
+        {/* Hover Text (hidden by default, slides in on hover) */}
         <span
           className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full"}`}
-          aria-hidden={!isHovered}
+          aria-hidden={!isHovered} // Hide from screen readers if not visible.
         >
           <span className="truncate">{textHover}</span>
         </span>
@@ -1588,7 +1904,11 @@ const HoverFlipButton = ({
   );
 };
 
+/**
+ * ContactSection Component: Displays contact information using HoverFlipButton.
+ */
 const ContactSection = () => {
+  // Array of contact button configurations.
   const contactButtons = [
     {
       href: "mailto:filipelqj@gmail.com",
@@ -1603,7 +1923,7 @@ const ContactSection = () => {
     {
       href: "mailto:filipe.junqueira@nottingham.ac.uk",
       IconInitial: Mail,
-      textInitial: "Work Email", // Changed from "Nottingham Email"
+      textInitial: "Work Email",
       textHover: "filipe.junqueira@nottingham.ac.uk",
       bgColorInitial: "bg-emerald-500 dark:bg-emerald-600",
       bgColorHover: "hover:bg-emerald-600 dark:hover:bg-emerald-700",
@@ -1629,12 +1949,11 @@ const ContactSection = () => {
       ariaLabel: "Filipe Junqueira on GitHub",
     },
     {
-      // New Twitter/X button
       href: "https://x.com/CaptBroccoli",
       IconInitial: Twitter,
       textInitial: "Twitter / X",
       textHover: "@CaptBroccoli",
-      bgColorInitial: "bg-sky-500 dark:bg-sky-600", // Twitter blue
+      bgColorInitial: "bg-sky-500 dark:bg-sky-600", // Twitter blue.
       bgColorHover: "hover:bg-sky-600 dark:hover:bg-sky-700",
       ariaLabel: "Filipe Junqueira (Captain Broccoli) on Twitter/X",
     },
@@ -1646,7 +1965,7 @@ const ContactSection = () => {
         connecting with like-minded individuals. Whether it's about nanoscience,
         3D art, or software development, feel free to reach out!
       </p>
-      {/* Updated grid classes to better accommodate 5 buttons */}
+      {/* Grid layout for contact buttons, adjusted for 5 items. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
         {contactButtons.map((button, index) => (
           <AnimatedSection key={index} delay={index * 0.1} threshold={0.1}>
@@ -1658,7 +1977,11 @@ const ContactSection = () => {
   );
 };
 
+/**
+ * Footer Component: The standard site footer.
+ */
 const Footer = () => (
+  // Using <footer> HTML5 semantic tag.
   <footer className="bg-emerald-700 dark:bg-slate-800 text-emerald-100 dark:text-slate-300 py-10 text-center">
     <div className="container mx-auto">
       <p className="text-sm">
@@ -1672,26 +1995,42 @@ const Footer = () => (
   </footer>
 );
 
+// --- Main App Component ---
+/**
+ * App Component: The root component of the application.
+ * Manages global state like dark mode, Firebase auth, and active navigation section.
+ * Renders all other sections and components.
+ */
 function App() {
+  // State for dark mode toggle.
   const [isDarkMode, setIsDarkMode] = useState(false);
+  // State for Firestore database instance.
   const [db, setDb] = useState(null);
-  const [auth, setAuth] = useState(null);
+  // State for Firebase Authentication instance.
+  // const [auth, setAuth] = useState(null); // `auth` was initialized but not used elsewhere. Removed for now.
+  // If needed for other Firebase auth operations, it can be reinstated.
+  // State for the current user's ID (from Firebase Auth).
   const [userId, setUserId] = useState(null);
+  // State to track if Firebase authentication has been initialized and resolved.
   const [isAuthReady, setIsAuthReady] = useState(false);
 
+  // --- SEO: Structured Data (JSON-LD) for Person schema ---
+  // This object provides detailed information about the person (Filipe) to search engines.
+  // It helps in generating rich snippets in search results.
   const personStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "Person",
+    "@context": "https://schema.org", // Specifies the vocabulary (Schema.org).
+    "@type": "Person", // Defines the type of entity.
     name: "Filipe L. Q. Junqueira",
-    url: "https://filipej.dev",
-    image: "https://filipej.dev/og-image.png",
+    url: "https://filipej.dev", // Canonical URL of the portfolio.
+    image: "https://filipej.dev/og-image.png", // URL to a representative image (e.g., profile or OG image).
     jobTitle: "Research Associate",
     worksFor: {
       "@type": "Organization",
       name: "University of Nottingham",
-      sameAs: "https://www.nottingham.ac.uk/physics/",
+      sameAs: "https://www.nottingham.ac.uk/physics/", // Optional: Link to the organization/department.
     },
     alumniOf: [
+      // Array of educational institutions.
       {
         "@type": "CollegeOrUniversity",
         name: "University of Nottingham",
@@ -1722,11 +2061,12 @@ function App() {
       "Computational Physics",
     ],
     sameAs: [
+      // Array of URLs to social media and other relevant profiles.
       "https://www.linkedin.com/in/filipejunqueira/",
       "https://github.com/filipejunqueira",
-      "https://x.com/CaptBroccoli", // Added Twitter/X profile to structured data
-      // "https://scholar.google.com/citations?user=YOUR_GOOGLE_SCHOLAR_ID",
-      // "https://www.researchgate.net/profile/YOUR_RESEARCHGATE_PROFILE",
+      "https://x.com/CaptBroccoli",
+      // Example: "https://scholar.google.com/citations?user=YOUR_GOOGLE_SCHOLAR_ID",
+      // Example: "https://www.researchgate.net/profile/YOUR_RESEARCHGATE_PROFILE",
     ],
     description:
       "Portfolio of Filipe L. Q. Junqueira, showcasing research in nanoscience, 3D atomic printing, advanced microscopy (NC-AFM/STM), Density Functional Theory (DFT), machine learning applications, Blender 3D art, and custom CLI tool development for scientific workflows.",
@@ -1736,45 +2076,60 @@ function App() {
     },
   };
 
+  // --- Firebase Initialization and Authentication Effect ---
+  // This useEffect hook runs once on component mount to initialize Firebase and set up auth listeners.
   useEffect(() => {
+    // Proceed only if Firebase config is available and valid.
     if (firebaseConfig && Object.keys(firebaseConfig).length > 0 && appId) {
       try {
+        // Initialize Firebase app with the provided configuration.
         const app = initializeApp(firebaseConfig);
+        // Get Firestore and Auth service instances.
         const firestoreDb = getFirestore(app);
-        const firebaseAuth = getAuth(app);
+        const firebaseAuth = getAuth(app); // `auth` variable was here, if needed reinstate setAuth(firebaseAuth)
         setDb(firestoreDb);
-        setAuth(firebaseAuth);
+        // setAuth(firebaseAuth); // Store auth instance if needed elsewhere.
 
+        // Set up an observer for authentication state changes.
+        // This callback fires when a user signs in, signs out, or token changes.
         const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
           if (user) {
+            // User is signed in (either anonymously or via custom token).
             setUserId(user.uid);
           } else {
+            // No user is signed in. Attempt to sign in.
+            // Try with initial auth token if provided (e.g., from Canvas environment).
             if (
               typeof __initial_auth_token !== "undefined" &&
               __initial_auth_token
             ) {
               try {
                 await signInWithCustomToken(firebaseAuth, __initial_auth_token);
+                // `onAuthStateChanged` will be triggered again with the new user state.
               } catch (customTokenError) {
                 console.warn(
-                  "Custom token sign-in failed, trying anonymous:",
+                  "Custom token sign-in failed, trying anonymous sign-in:",
                   customTokenError,
                 );
+                // Fallback to anonymous sign-in if custom token fails.
                 try {
                   await signInAnonymously(firebaseAuth);
                 } catch (anonError) {
-                  console.error("Anonymous sign-in failed:", anonError);
+                  console.error("Anonymous sign-in also failed:", anonError);
+                  // As a last resort, use a localStorage-backed or random UID.
                   setUserId(
                     localStorage.getItem("portfolio-fallback-uid") ||
-                      crypto.randomUUID(),
+                      crypto.randomUUID(), // Generates a random UUID if nothing in localStorage.
                   );
                 }
               }
             } else {
+              // If no initial token, try anonymous sign-in directly.
               try {
                 await signInAnonymously(firebaseAuth);
               } catch (anonError) {
                 console.error("Anonymous sign-in failed:", anonError);
+                // Fallback UID generation if anonymous sign-in fails.
                 let fallbackUid = localStorage.getItem(
                   "portfolio-fallback-uid",
                 );
@@ -1786,43 +2141,54 @@ function App() {
               }
             }
           }
-          setIsAuthReady(true);
+          setIsAuthReady(true); // Mark authentication process as complete.
         });
+        // Cleanup function: Unsubscribe the auth listener when the component unmounts.
         return () => unsubscribe();
       } catch (error) {
+        // Handle errors during Firebase initialization.
         console.error("Firebase initialization error:", error);
-        setIsAuthReady(true);
+        setIsAuthReady(true); // Still mark as ready to allow UI to render.
         let fallbackUid = localStorage.getItem("portfolio-fallback-uid");
         if (!fallbackUid) {
           fallbackUid = crypto.randomUUID();
           localStorage.setItem("portfolio-fallback-uid", fallbackUid);
         }
-        setUserId(fallbackUid);
+        setUserId(fallbackUid); // Use fallback UID.
       }
     } else {
+      // If Firebase config is missing or invalid.
       console.warn(
-        "Firebase config is missing or empty. Dark mode preference will use localStorage.",
+        "Firebase config is missing or empty. Dark mode preference will use localStorage only.",
       );
-      setIsAuthReady(true);
+      setIsAuthReady(true); // Mark as ready.
       let fallbackUid = localStorage.getItem("portfolio-fallback-uid");
       if (!fallbackUid) {
         fallbackUid = crypto.randomUUID();
         localStorage.setItem("portfolio-fallback-uid", fallbackUid);
       }
-      setUserId(fallbackUid);
+      setUserId(fallbackUid); // Use fallback UID.
     }
-  }, []);
+  }, []); // Empty dependency array ensures this effect runs only once on mount.
 
+  // --- Dark Mode Preference Loading Effect ---
+  // This useEffect hook loads the dark mode preference when auth is ready and a userId is available.
   useEffect(() => {
+    // Don't run if auth isn't ready or if there's no userId.
     if (!isAuthReady || !userId) return;
+
     const loadPreference = async () => {
-      let darkModeEnabled = false;
+      let darkModeEnabled = false; // Default to light mode.
+
+      // 1. Try to load from localStorage (quickest method).
       const localPreference = localStorage.getItem(`darkMode-${userId}`);
       if (localPreference !== null) {
         darkModeEnabled = JSON.parse(localPreference);
       }
 
+      // 2. If Firestore is available, try to load from there (can override localStorage if values differ).
       if (db) {
+        // Construct the path to the user's dark mode preference document in Firestore.
         const prefDocRef = doc(
           db,
           "artifacts",
@@ -1835,28 +2201,41 @@ function App() {
         try {
           const docSnap = await getDoc(prefDocRef);
           if (docSnap.exists()) {
+            // Check if the document exists.
             const prefData = docSnap.data();
             if (typeof prefData.enabled === "boolean") {
+              // Ensure 'enabled' field is a boolean.
               darkModeEnabled = prefData.enabled;
             }
           }
         } catch (error) {
-          console.error("Error loading dark mode from Firestore:", error);
+          console.error(
+            "Error loading dark mode preference from Firestore:",
+            error,
+          );
+          // If Firestore loading fails, the value from localStorage (or default) will be used.
         }
       }
-      setIsDarkMode(darkModeEnabled);
+      setIsDarkMode(darkModeEnabled); // Set the dark mode state.
     };
     loadPreference();
-  }, [isAuthReady, db, userId]);
+  }, [isAuthReady, db, userId, appId]); // Dependencies: Re-run if any of these change. (Added appId for completeness if it could change, though unlikely here)
 
+  // --- Dark Mode Apply and Save Effect ---
+  // This useEffect hook applies the dark mode class to the HTML document and saves the preference.
   useEffect(() => {
+    // Apply/remove 'dark' class to the root <html> element for Tailwind CSS styling.
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    // Save the dark mode preference if auth is ready and userId exists.
     if (isAuthReady && userId) {
+      // 1. Save to localStorage.
       localStorage.setItem(`darkMode-${userId}`, JSON.stringify(isDarkMode));
+      // 2. Save to Firestore if available.
       if (db) {
         const prefDocRef = doc(
           db,
@@ -1867,35 +2246,51 @@ function App() {
           "preferences",
           "darkMode",
         );
+        // Use `merge: true` to avoid overwriting other preferences if they exist in the same document.
         setDoc(prefDocRef, { enabled: isDarkMode }, { merge: true }).catch(
           (error) =>
-            console.error("Error saving dark mode to Firestore:", error),
+            console.error(
+              "Error saving dark mode preference to Firestore:",
+              error,
+            ),
         );
       }
     }
-  }, [isDarkMode, isAuthReady, db, userId]);
+  }, [isDarkMode, isAuthReady, db, userId, appId]); // Dependencies.
 
+  // Function to toggle dark mode state.
   const toggleDarkMode = () => setIsDarkMode((prevMode) => !prevMode);
 
+  // State for the currently active navigation section (used for smooth scrolling).
   const [activeSection, setActiveSection] = useState("home");
+
+  // --- Section Scrolling Effect ---
+  // This useEffect hook handles smooth scrolling to sections when `activeSection` changes or when a URL hash is present.
   useEffect(() => {
+    // Get section ID from URL hash (e.g., #about -> "about").
     const hash = window.location.hash.substring(1);
+    // Determine which section to scroll to: either from hash or from `activeSection` state.
     const sectionIdToScroll =
       hash || (activeSection !== "home" ? activeSection : null);
+
     if (sectionIdToScroll) {
       const element = document.getElementById(sectionIdToScroll);
       if (element) {
+        // Calculate offset position considering navbar height and some padding.
         const navbarHeight = document.querySelector("nav")?.offsetHeight || 0;
         const elementPosition =
-          element.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementPosition - navbarHeight - 24;
+          element.getBoundingClientRect().top + window.pageYOffset; // Element's top relative to document.
+        const offsetPosition = elementPosition - navbarHeight - 24; // 24px additional offset.
+        // Scroll smoothly to the calculated position.
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       }
     } else if (activeSection === "home" && !hash) {
+      // If activeSection is 'home' and no hash in URL, scroll to the top of the page.
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [activeSection]);
+  }, [activeSection]); // Dependency: Re-run this effect when `activeSection` changes.
 
+  // Framer Motion animation variants for specific sections.
   const fadeInFromLeft = {
     hidden: { opacity: 0, x: -50 },
     visible: {
@@ -1913,11 +2308,13 @@ function App() {
     },
   };
 
+  // --- Loading State Display ---
+  // Show a loading spinner while Firebase authentication is being resolved (if config is present).
   if (
-    !isAuthReady &&
+    !isAuthReady && // If auth is not yet ready
     firebaseConfig &&
     Object.keys(firebaseConfig).length > 0 &&
-    appId
+    appId // And Firebase is configured
   ) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-emerald-50 dark:bg-slate-900">
@@ -1929,21 +2326,38 @@ function App() {
     );
   }
 
+  // --- Main App Render ---
   return (
+    // Root container for the entire application.
     <div className="font-sans bg-emerald-50/50 dark:bg-slate-900 text-gray-800 dark:text-slate-200 min-h-screen transition-colors duration-300">
+      {/* SEO: Helmet component to inject elements into the document's <head>. */}
       <Helmet>
+        {/* JSON-LD Structured Data script for Person schema. */}
+        {/* This helps search engines understand the content of the page better. */}
         <script type="application/ld+json">
           {JSON.stringify(personStructuredData)}
         </script>
+        {/* Optionally, manage <title> and <meta name="description"> here if they need to be dynamic 
+          based on component state or routes. For a single-page scrolling site, these are often
+          sufficiently handled in index.html for the primary view.
+          Example:
+          <title>Filipe L. Q. Junqueira - Portfolio | Nanoscience & Development</title>
+          <meta name="description" content={personStructuredData.description} />
+        */}
       </Helmet>
 
+      {/* Site Navigation Bar */}
       <Navbar
         setActiveSection={setActiveSection}
         toggleDarkMode={toggleDarkMode}
         isDarkMode={isDarkMode}
       />
+      {/* Hero/Introduction Section */}
       <HeroSection />
+
+      {/* Main content area of the page, using <main> HTML5 semantic tag. */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+        {/* Each major section is wrapped in AnimatedSection for scroll-triggered animations. */}
         <AnimatedSection
           id="about-animated-wrapper"
           variants={defaultVariants}
@@ -2001,9 +2415,12 @@ function App() {
           <ContactSection />
         </AnimatedSection>
       </main>
+
+      {/* Site Footer */}
       <Footer />
     </div>
   );
 }
 
+// Export the App component as the default export of this module.
 export default App;

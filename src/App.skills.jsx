@@ -48,12 +48,11 @@ import {
   Sun,
   Moon,
   User,
-  MessageSquare,
-  HardDrive,
-  Atom,
-  Globe,
-  Lightbulb,
-  Presentation, // Icon for Teaching
+  MessageSquare, // Added User for About Me, MessageSquare for Languages
+  HardDrive, // For Computer Skills
+  Atom, // For Scientific Tools
+  Globe, // For Languages (alternative)
+  Lightbulb, // For Skills section main icon
 } from "lucide-react";
 
 import profilePic from "./assets/captainbroccoli.png";
@@ -220,6 +219,7 @@ const ProjectCard = ({
         >
           {description}
         </p>
+        {/* Display artistic statement if available */}
         {artisticStatement && (
           <p
             className={`text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4 ${isDescriptionExpanded ? "" : "line-clamp-2"}`}
@@ -309,7 +309,6 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
     { id: "home", label: "Home" },
     { id: "about", label: "About" },
     { id: "skills", label: "Skills" },
-    { id: "teaching", label: "Teaching" }, // Added Teaching link
     { id: "scientist", label: "Career & Education" },
     { id: "publications", label: "Publications" },
     { id: "blender", label: "Blender Art" },
@@ -532,6 +531,7 @@ const HeroSection = () => (
   </section>
 );
 
+// --- NEW AboutMeSection ---
 const AboutMeSection = () => {
   const aboutMeNarrative = [
     "Driven by an insatiable curiosity for the quantum realm and a passion for computational problem-solving, I thrive at the intersection of nanoscience, data science, and creative technology.",
@@ -546,6 +546,8 @@ const AboutMeSection = () => {
       id="about"
       titleClassName="text-3xl sm:text-4xl md:text-5xl"
     >
+      {" "}
+      {/* Slightly larger title for this section */}
       <div className="max-w-3xl mx-auto space-y-5">
         {aboutMeNarrative.map((paragraph, index) => (
           <motion.p
@@ -563,6 +565,7 @@ const AboutMeSection = () => {
   );
 };
 
+// --- NEW SkillsSection ---
 const SkillsSection = () => {
   const skillsData = {
     computerSkills: [
@@ -623,6 +626,7 @@ const SkillsSection = () => {
   return (
     <Section title="Core Competencies & Skills" icon={Lightbulb} id="skills">
       <div className="grid md:grid-cols-3 gap-10">
+        {/* Computer Skills */}
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <HardDrive className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
@@ -636,6 +640,8 @@ const SkillsSection = () => {
             ))}
           </ul>
         </div>
+
+        {/* Scientific Tools */}
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <Atom className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
@@ -649,6 +655,8 @@ const SkillsSection = () => {
             ))}
           </ul>
         </div>
+
+        {/* Languages */}
         <div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4 flex items-center">
             <Globe className="w-6 h-6 mr-2 text-emerald-500 dark:text-emerald-400" />{" "}
@@ -666,69 +674,6 @@ const SkillsSection = () => {
             ))}
           </ul>
         </div>
-      </div>
-    </Section>
-  );
-};
-
-// --- NEW TeachingSection ---
-const TeachingSection = () => {
-  const teachingPoints = [
-    "Extensive experience tutoring students for International Mathematics Olympiads (IMO), focusing on advanced problem-solving techniques in Number Theory, Combinatorics, Algebra, and Geometry.",
-    "Provided tailored coaching for IB (International Baccalaureate) Mathematics (HL/SL) and Physics (HL/SL), helping students achieve top grades and develop a deep understanding of core concepts.",
-    "Developed custom learning materials and practice sets to address individual student needs and learning styles.",
-    "Passionate about fostering critical thinking and a love for mathematics and physics in young minds.",
-  ];
-
-  return (
-    <Section title="Teaching & Tutoring" icon={Presentation} id="teaching">
-      {" "}
-      {/* Using Presentation icon */}
-      <div className="max-w-3xl mx-auto space-y-6">
-        <motion.p
-          className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          Beyond my research and creative projects, I am deeply committed to
-          education and mentorship. I have a rewarding side-venture in tutoring,
-          primarily focused on preparing students for high-level mathematics
-          competitions and rigorous academic programs.
-        </motion.p>
-
-        <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-slate-300 text-base md:text-lg">
-          {teachingPoints.map((point, index) => (
-            <motion.li
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-              className="ml-4"
-            >
-              {point}
-            </motion.li>
-          ))}
-        </ul>
-
-        <motion.div
-          className="text-center mt-8"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.5,
-            delay: 0.3 + teachingPoints.length * 0.1,
-          }}
-        >
-          <a
-            href="http://filipej.com" // Make sure to use http:// or https://
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
-          >
-            Visit My Tutoring Site <ExternalLink size={18} />
-          </a>
-        </motion.div>
       </div>
     </Section>
   );
@@ -1018,6 +963,7 @@ const CLIToolsSection = () => {
               <p className="text-gray-700 dark:text-slate-300 text-sm mb-3 leading-relaxed">
                 {tool.description}
               </p>
+              {/* Display Problem Solved */}
               {tool.problemSolved && (
                 <p className="text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4">
                   <span className="font-semibold">Impact: </span>
@@ -1768,6 +1714,7 @@ function App() {
       />
       <HeroSection />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+        {/* New sections added here */}
         <AnimatedSection
           id="about-animated-wrapper"
           variants={defaultVariants}
@@ -1782,14 +1729,7 @@ function App() {
         >
           <SkillsSection />
         </AnimatedSection>
-        {/* New Teaching Section Added Here */}
-        <AnimatedSection
-          id="teaching-animated-wrapper"
-          variants={defaultVariants}
-          delay={0.18}
-        >
-          <TeachingSection />
-        </AnimatedSection>
+
         <AnimatedSection
           id="scientist-animated-wrapper"
           variants={fadeInFromLeft}

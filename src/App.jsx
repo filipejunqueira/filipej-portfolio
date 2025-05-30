@@ -40,6 +40,10 @@ import {
   Loader2,
   AlertTriangle,
   UserCircle,
+  Terminal, // Added for new CLI section
+  BarChart3, // Added for new CLI section
+  Zap, // Added for new CLI section
+  FileCode, // Added for new CLI section
 } from "lucide-react";
 
 // Import your profile picture
@@ -47,31 +51,25 @@ import {
 import profilePic from "./assets/captainbroccoli.png";
 
 // Import your CV PDF file from the assets folder
-import filipeCv from "./assets/filipecv.pdf"; // Corrected filename
+import filipeCv from "./assets/filipecv.pdf";
 
 // --- Import Blender Project Images ---
-// Abstract 3D Art
 import blenderA from "./assets/blenderA.png";
 import blenderA1 from "./assets/blenderA1.png";
 import blenderA2 from "./assets/blenderA2.png";
 import blenderA3 from "./assets/blenderA3.png";
-
-// Scientific Visualization
 import blenderB from "./assets/blenderB.png";
 import blenderB1 from "./assets/blenderB1.png";
 import blenderB2 from "./assets/blenderB2.png";
 import blenderB3 from "./assets/blenderB3.png";
 import blenderB4 from "./assets/blenderB4.png";
 import blenderB5 from "./assets/blenderB5.png";
-
-// Character/Concept Design
 import blenderC from "./assets/blenderC.png";
 import blenderC1 from "./assets/blenderC1.png";
 import blenderC2 from "./assets/blenderC2.png";
 import blenderC3 from "./assets/blenderC3.png";
 
 // --- AnimatedSection Component ---
-// This component wraps its children, applying animations when it scrolls into view.
 const defaultVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
@@ -130,13 +128,13 @@ const Section = ({ title, icon: IconComponent, children, id }) => (
   </section>
 );
 
-// Updated ProjectCard to use actual images for Blender projects
 const ProjectCard = ({
+  // This is for Blender projects, CLI section will have its own card structure
   title,
   description,
-  mainImage, // Prop for the main display image (for Blender projects)
-  galleryImages, // Prop for the array of gallery images (for Blender projects)
-  imagePlaceholderColor, // Kept for CLI projects or as a fallback
+  mainImage,
+  galleryImages,
+  imagePlaceholderColor,
   link,
   type,
   isGalleryOpen,
@@ -144,45 +142,30 @@ const ProjectCard = ({
 }) => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const toggleDescription = () => {
+  const toggleDescription = () =>
     setIsDescriptionExpanded(!isDescriptionExpanded);
-  };
-
   const nextImage = (e) => {
     e.stopPropagation();
-    if (galleryImages && galleryImages.length > 0) {
-      setCurrentImageIndex(
-        (prevIndex) => (prevIndex + 1) % galleryImages.length,
-      );
-    }
+    if (galleryImages && galleryImages.length > 0)
+      setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
   };
-
   const prevImage = (e) => {
     e.stopPropagation();
-    if (galleryImages && galleryImages.length > 0) {
+    if (galleryImages && galleryImages.length > 0)
       setCurrentImageIndex(
-        (prevIndex) =>
-          (prevIndex - 1 + galleryImages.length) % galleryImages.length,
+        (prev) => (prev - 1 + galleryImages.length) % galleryImages.length,
       );
-    }
   };
-
   useEffect(() => {
-    if (type === "blender" && !isGalleryOpen) {
-      setCurrentImageIndex(0); // Reset gallery index when it's closed
-    }
+    if (type === "blender" && !isGalleryOpen) setCurrentImageIndex(0);
   }, [isGalleryOpen, type]);
-
-  // Fallback for image loading errors
   const imageErrorHandler = (e) => {
-    e.target.onerror = null; // Prevents infinite loop if placeholder also fails
+    e.target.onerror = null;
     e.target.src = `https://placehold.co/600x400/CCCCCC/FFFFFF?text=Image+Not+Found`;
   };
 
   return (
     <div className="bg-emerald-50 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
-      {/* Main visual: Use <img> for Blender, div with icon for CLI */}
       {type === "blender" && mainImage ? (
         <img
           src={mainImage}
@@ -194,11 +177,9 @@ const ProjectCard = ({
         <div
           className={`w-full h-48 md:h-56 rounded-md flex items-center justify-center text-white text-xl font-semibold mb-4 ${imagePlaceholderColor || "bg-gray-400"}`}
         >
-          {/* Display appropriate icon based on type if no image */}
           {type === "blender" ? <Palette size={48} /> : <Code size={48} />}
         </div>
       )}
-
       <h3 className="text-xl md:text-2xl font-semibold text-emerald-800 mb-2">
         {title}
       </h3>
@@ -222,10 +203,9 @@ const ProjectCard = ({
           )}
         </button>
       )}
-
       <div className="mt-auto">
         {type === "blender" &&
-          galleryImages && // Check for galleryImages before showing button
+          galleryImages &&
           galleryImages.length > 0 &&
           onToggleGallery && (
             <button
@@ -240,19 +220,18 @@ const ProjectCard = ({
               )}
             </button>
           )}
-        {type === "cli" && link && (
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-emerald-500 hover:text-emerald-700 font-medium transition-colors duration-300 self-start"
-          >
-            View on GitHub <Github size={18} className="ml-2" />
-          </a>
-        )}
+        {type === "cli" &&
+          link && ( // This part is for the OLD CLI card, new one is in CLIToolsSection
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-emerald-500 hover:text-emerald-700 font-medium transition-colors duration-300 self-start"
+            >
+              View on GitHub <Github size={18} className="ml-2" />
+            </a>
+          )}
       </div>
-
-      {/* Inline Image Gallery for Blender projects */}
       {type === "blender" &&
         isGalleryOpen &&
         galleryImages &&
@@ -262,7 +241,7 @@ const ProjectCard = ({
               <img
                 src={galleryImages[currentImageIndex]}
                 alt={`${title} - Gallery Image ${currentImageIndex + 1}`}
-                className="w-full h-56 md:h-72 rounded-md object-cover shadow-inner bg-gray-200" // Added bg-gray-200 for loading
+                className="w-full h-56 md:h-72 rounded-md object-cover shadow-inner bg-gray-200"
                 onError={imageErrorHandler}
               />
               {galleryImages.length > 1 && (
@@ -316,7 +295,6 @@ const Navbar = ({ setActiveSection }) => {
     color: ["#FFFFFF", "#A7F3D0", "#FFFFFF"],
     transition: { duration: 0.5, ease: "easeInOut" },
   };
-
   return (
     <nav className="bg-emerald-600 text-white sticky top-0 z-50 shadow-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -492,17 +470,14 @@ const HeroSection = () => (
   </section>
 );
 
-// Updated BlenderCreations to use imported images
 const BlenderCreations = () => {
   const [expandedGalleryId, setExpandedGalleryId] = useState(null);
-
-  // Updated project data with imported image variables
   const blenderProjects = [
     {
       id: 1,
       title: "Abstract 3D Art",
       description:
-        "Exploring forms, textures, and lighting using Blender for creating visually compelling abstract scenes. This involves procedural texturing and complex node setups.",
+        "Exploring forms, textures, and lighting using Blender for creating visually compelling abstract scenes. This involves procedural texturing and complex node setups for dynamic and intricate results.",
       mainImage: blenderA,
       galleryImages: [blenderA1, blenderA2, blenderA3],
     },
@@ -510,7 +485,7 @@ const BlenderCreations = () => {
       id: 2,
       title: "Scientific Visualization",
       description:
-        "Using Blender to create visualizations for complex scientific concepts, such as molecular structures or physical phenomena, making them accessible and understandable.",
+        "Using Blender to create visualizations for complex scientific concepts, such as molecular structures, quantum phenomena, or astrophysical simulations, making them accessible and understandable to a broader audience.",
       mainImage: blenderB,
       galleryImages: [blenderB1, blenderB2, blenderB3, blenderB4, blenderB5],
     },
@@ -518,21 +493,20 @@ const BlenderCreations = () => {
       id: 3,
       title: "Character/Concept Design",
       description:
-        "Developing unique characters and concepts in 3D, from initial sculpting to final texturing and rigging for animation or static renders.",
+        "Developing unique characters and concepts in 3D, from initial sculpting and retopology to final texturing, rigging for animation, or preparing for 3D printing.",
       mainImage: blenderC,
       galleryImages: [blenderC1, blenderC2, blenderC3],
     },
   ];
-
-  const handleToggleGallery = (projectId) => {
+  const handleToggleGallery = (projectId) =>
     setExpandedGalleryId((prevId) => (prevId === projectId ? null : projectId));
-  };
-
   return (
     <Section title="Blender Art & 3D Visualization" icon={Palette} id="blender">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
-        Leveraging Blender for creative 3D projects and scientific
-        visualization. Each piece is a journey into form, light, and narrative.
+        Leveraging Blender for creative 3D projects, scientific visualization,
+        and concept art. Each piece is a journey into form, light, and
+        narrative, aiming to bridge the gap between the technical and the
+        aesthetic.
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
         {blenderProjects.map((project, index) => (
@@ -542,11 +516,7 @@ const BlenderCreations = () => {
             threshold={0.1}
           >
             <ProjectCard
-              title={project.title}
-              description={project.description}
-              mainImage={project.mainImage} // Pass the main image
-              galleryImages={project.galleryImages} // Pass the gallery images
-              // imagePlaceholderColor is no longer primary for Blender, but can be a fallback if mainImage fails (handled in ProjectCard)
+              {...project}
               type="blender"
               isGalleryOpen={expandedGalleryId === project.id}
               onToggleGallery={() => handleToggleGallery(project.id)}
@@ -555,62 +525,148 @@ const BlenderCreations = () => {
         ))}
       </div>
       <p className="text-center text-md text-emerald-500 mt-10 md:mt-12">
-        More creations and visualizations coming soon! Stay tuned for updates.
+        More creations and visualizations coming soon! Stay tuned for updates on
+        new projects and explorations.
       </p>
     </Section>
   );
 };
 
-const CLIPrograms = () => {
-  const cliProjects = [
+// --- NEW CLI TOOLS SECTION ---
+const CLIToolsSection = () => {
+  // Data for your CLI tools, adapt as needed
+  const cliToolsData = [
     {
       id: 1,
-      title: "DFT & Simulation Scripts",
+      title: "DFT Automation Suite",
       description:
-        "Custom Python and Bash scripts for automating Density Functional Theory (DFT) calculations and managing simulation workflows on high-performance computing clusters.",
-      imagePlaceholderColor: "bg-slate-500",
-      githubLink: "https://github.com/filipejunqueira",
+        "A Python-based CLI tool to streamline Density Functional Theory (DFT) calculations, manage input/output files for software like VASP or Quantum Espresso, and automate job submissions to HPC clusters using SLURM or PBS.",
+      icon: FileCode,
+      codeExample: `> dft-suite run --job_type relax --struct Si.vasp\nInitializing calculation for Si.vasp...\nInput files generated.\nSubmitting job to SLURM ID: 12345\nMonitoring status... Job completed successfully.\nFinal energy: -5.42 eV/atom`,
+      tags: ["Python", "CLI", "DFT", "VASP", "HPC", "Automation", "SLURM"],
+      githubLink: "https://github.com/filipejunqueira/dft-suite",
     },
     {
       id: 2,
-      title: "Machine Learning Utilities",
+      title: "SPM Data Analyzer",
       description:
-        "Command-line tools for preprocessing data, training machine learning models, and evaluating their performance, tailored for scientific datasets.",
-      imagePlaceholderColor: "bg-gray-500",
-      githubLink: "https://github.com/filipejunqueira",
+        "Command-line utilities for processing and analyzing Scanning Probe Microscopy (SPM) data (AFM/STM). Features include drift correction, plane fitting, noise filtering, tip deconvolution, and basic statistical analysis of surface features.",
+      icon: BarChart3,
+      codeExample: `> spm-analyzer process --file afm_scan.xyz --drift_correct --plane_fit\nProcessing scan data: afm_scan.xyz\nApplying 2D polynomial drift correction...\nPerforming plane fitting (order 1)...\nDrift corrected. RMS roughness: 0.15 nm\nSaving processed_afm_scan.dat`,
+      tags: [
+        "Python",
+        "CLI",
+        "SPM",
+        "AFM",
+        "STM",
+        "Data Analysis",
+        "Nanoscience",
+      ],
+      githubLink: "https://github.com/filipejunqueira/spm-analyzer",
     },
     {
       id: 3,
-      title: "Data Analysis & Plotting Tools",
+      title: "Quick Plotter CLI",
       description:
-        "CLI tools for quick data analysis, statistical summaries, and generating publication-quality plots directly from the terminal using libraries like Matplotlib and Seaborn.",
-      imagePlaceholderColor: "bg-stone-500",
-      githubLink: "https://github.com/filipejunqueira",
+        "A rapid plotting tool for generating publication-quality graphs from CSV or text files directly from the terminal. Supports various plot types, custom labels, legends, and output formats, powered by Matplotlib.",
+      icon: Zap,
+      codeExample: `> quickplot --file results.csv --x_col "Voltage" --y_col "Current" \\ \n  -t "I-V Curve for Device X" --xlabel "Voltage (V)" --ylabel "Current (nA)" --save plot.png\nGenerating plot 'I-V Curve for Device X'...\nSaved to plot_Voltage_vs_Current.png`,
+      tags: [
+        "Python",
+        "CLI",
+        "Plotting",
+        "Matplotlib",
+        "Data Viz",
+        "Automation",
+      ],
+      githubLink: "https://github.com/filipejunqueira/quickplot",
     },
   ];
+
+  // Animation variants for the CLI tool cards - adjusted for potentially better performance
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        delay: i * 0.1, // Slightly faster stagger
+        duration: 0.5,
+        ease: "easeOut", // Changed from spring
+      },
+    }),
+    hover: {
+      y: -8,
+      scale: 1.03,
+      boxShadow: "0px 10px 25px rgba(16, 185, 129, 0.1)",
+    }, // Emerald-themed shadow
+  };
+
   return (
-    <Section title="CLI Tools & Scripts" icon={Cpu} id="cli">
-      <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
-        Developing efficient command-line tools using Python, Bash, and various
-        data science libraries to streamline research workflows and enhance
-        productivity.
+    <Section title="CLI Tools & Scripts" icon={Terminal} id="cli">
+      <p className="text-center text-lg text-emerald-600 mb-12 md:mb-16 max-w-2xl mx-auto">
+        Crafting efficient command-line interfaces to accelerate research and
+        automate complex tasks in nanoscience and data analysis. These tools are
+        designed for robustness and ease of use.
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {cliProjects.map((project, index) => (
-          <AnimatedSection
-            key={project.id}
-            delay={index * 0.15}
-            threshold={0.1}
-          >
-            <ProjectCard
-              title={project.title}
-              description={project.description}
-              imagePlaceholderColor={project.imagePlaceholderColor} // CLI projects still use placeholder colors
-              link={project.githubLink}
-              type="cli"
-            />
-          </AnimatedSection>
-        ))}
+        {cliToolsData.map((tool, index) => {
+          const ToolIcon = tool.icon;
+          return (
+            <motion.div
+              key={tool.id}
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-emerald-200/50 transition-all duration-300 flex flex-col cursor-default border border-emerald-100 hover:border-emerald-300"
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              whileHover="hover"
+              viewport={{ once: true, amount: 0.1 }}
+              custom={index}
+            >
+              <div className="flex items-center text-emerald-600 mb-5">
+                <ToolIcon className="h-10 w-10 mr-4 stroke-1.5 flex-shrink-0" />{" "}
+                {/* Added flex-shrink-0 */}
+                <h3 className="text-xl lg:text-2xl font-semibold text-emerald-800">
+                  {tool.title}
+                </h3>
+              </div>
+              <p className="text-emerald-700/90 mb-5 text-sm flex-grow leading-relaxed">
+                {tool.description}
+              </p>
+              <div className="mb-6 flex flex-wrap gap-2">
+                {tool.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {tool.codeExample && (
+                <div className="bg-gray-800 text-gray-300 p-4 rounded-lg font-mono text-xs sm:text-sm mb-6 overflow-x-auto shadow-inner">
+                  <pre className="whitespace-pre-wrap text-emerald-400">
+                    {tool.codeExample}
+                  </pre>
+                </div>
+              )}
+              <motion.a
+                href={tool.githubLink || "https://github.com/filipejunqueira"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-500 text-white font-semibold py-2.5 px-5 rounded-lg hover:bg-emerald-600 transition-colors duration-300 shadow-md hover:shadow-lg"
+                whileHover={{
+                  scale: 1.05,
+                  transition: { type: "spring", stiffness: 300, damping: 10 },
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Github size={18} /> View on GitHub
+              </motion.a>
+            </motion.div>
+          );
+        })}
       </div>
     </Section>
   );
@@ -709,17 +765,16 @@ const ScientistCareer = () => {
         "Focused on Group Theory and Galois Theory. Participated in weekly seminars and worked on problem sets that extended beyond the standard undergraduate curriculum, fostering a deeper understanding of mathematical proofs and structures.",
     },
   ];
-  const handleToggleDetail = (milestoneId) => {
+  const handleToggleDetail = (milestoneId) =>
     setExpandedDetailId((prevId) =>
       prevId === milestoneId ? null : milestoneId,
     );
-  };
   return (
     <Section title="Career & Education" icon={Briefcase} id="scientist">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
         A journey through academia and industry, driven by a passion for
         physics, data, and problem-solving. Each step has been a building block
-        towards new discoveries.
+        towards new discoveries and innovations.
       </p>
       <div className="space-y-8">
         {careerMilestones.map((milestone, index) => {
@@ -809,7 +864,7 @@ const PublicationItem = ({ pub }) => {
     const prompt = `Please provide a concise summary or explain the significance of the following scientific publication in 2-3 sentences, suitable for a general audience. Focus on the key findings or impact:\nTitle: "${pub.title}"\nAuthors: ${pub.authors}\nJournal: ${pub.journal}\nYear: ${pub.year}\n${pub.note ? `Note: ${pub.note}` : ""}\nWhat are the main takeaways or importance of this research?`;
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKeyGen = ""; // Gemini API Key
+    const apiKeyGen = "";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyGen}`;
     try {
       const response = await fetch(apiUrl, {
@@ -821,28 +876,19 @@ const PublicationItem = ({ pub }) => {
         const errorData = await response.json();
         console.error("Gemini API Error:", errorData);
         throw new Error(
-          `API request failed with status ${response.status}: ${errorData?.error?.message || "Unknown error"}`,
+          `API request failed: ${errorData?.error?.message || response.status}`,
         );
       }
       const result = await response.json();
-      if (
-        result.candidates &&
-        result.candidates.length > 0 &&
-        result.candidates[0].content &&
-        result.candidates[0].content.parts &&
-        result.candidates[0].content.parts.length > 0
-      ) {
-        const text = result.candidates[0].content.parts[0].text;
-        setSummary(text);
+      if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+        setSummary(result.candidates[0].content.parts[0].text);
       } else {
-        console.error("Unexpected API response structure:", result);
-        throw new Error("Failed to extract summary from API response.");
+        console.error("Unexpected API response:", result);
+        throw new Error("Failed to extract summary.");
       }
     } catch (error) {
-      console.error("Error generating summary:", error);
-      setSummaryError(
-        error.message || "An error occurred while generating the summary.",
-      );
+      console.error("Summary generation error:", error);
+      setSummaryError(error.message || "Error generating summary.");
     } finally {
       setIsLoadingSummary(false);
     }
@@ -900,10 +946,7 @@ const PublicationItem = ({ pub }) => {
               <AlertTriangle size={18} className="mr-2 flex-shrink-0" />
               <div>
                 <strong>Error:</strong> {summaryError}
-                <p className="text-xs mt-1">
-                  Please try again later. The AI might be busy or there was a
-                  network issue.
-                </p>
+                <p className="text-xs mt-1">Please try again later.</p>
               </div>
             </div>
           )}
@@ -973,7 +1016,9 @@ const PublicationsSection = () => {
     <Section title="Selected Publications" icon={BookOpen} id="publications">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
         Contributing to the body of scientific knowledge through peer-reviewed
-        research. Click "Explain with AI" for a quick summary!
+        research. These works explore topics from machine learning in microscopy
+        to fundamental studies of molecular interactions. Click "Explain with
+        AI" for a quick summary!
       </p>
       <div className="space-y-6">
         {publications.map((pub, index) => (
@@ -1038,7 +1083,7 @@ const ContactSection = () => {
       bgColorInitial: "bg-red-500",
       bgColorHover: "hover:bg-red-600",
       isExternal: false,
-      ariaLabel: "Email Filipe at his personal email address",
+      ariaLabel: "Email Filipe (Personal)",
     },
     {
       href: "mailto:filipe.junqueira@nottingham.ac.uk",
@@ -1048,7 +1093,7 @@ const ContactSection = () => {
       bgColorInitial: "bg-emerald-500",
       bgColorHover: "hover:bg-emerald-600",
       isExternal: false,
-      ariaLabel: "Email Filipe at University of Nottingham",
+      ariaLabel: "Email Filipe (Nottingham)",
     },
     {
       href: "https://linkedin.com/in/filipejunqueira",
@@ -1073,7 +1118,8 @@ const ContactSection = () => {
     <Section title="Get In Touch" icon={Users} id="contact">
       <p className="text-center text-lg text-emerald-600 mb-8 md:mb-10 max-w-xl mx-auto">
         I'm always open to discussing new projects, collaborations, or just
-        connecting with like-minded individuals. Feel free to reach out!
+        connecting with like-minded individuals. Whether it's about nanoscience,
+        3D art, or software development, feel free to reach out!
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {contactButtons.map((button, index) => (
@@ -1166,7 +1212,7 @@ function App() {
           variants={defaultVariants}
           delay={0.2}
         >
-          <CLIPrograms />
+          <CLIToolsSection />
         </AnimatedSection>
         <AnimatedSection
           id="contact-animated-wrapper"

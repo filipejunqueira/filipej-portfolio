@@ -47,30 +47,36 @@ import {
 import profilePic from "./assets/captainbroccoli.png";
 
 // Import your CV PDF file from the assets folder
-import filipeCv from "./assets/filipecv.pdf";
+import filipeCv from "./assets/filipecv.pdf"; // Corrected filename
+
+// --- Import Blender Project Images ---
+// Abstract 3D Art
+import blenderA from "./assets/blenderA.png";
+import blenderA1 from "./assets/blenderA1.png";
+import blenderA2 from "./assets/blenderA2.png";
+import blenderA3 from "./assets/blenderA3.png";
+
+// Scientific Visualization
+import blenderB from "./assets/blenderB.png";
+import blenderB1 from "./assets/blenderB1.png";
+import blenderB2 from "./assets/blenderB2.png";
+import blenderB3 from "./assets/blenderB3.png";
+import blenderB4 from "./assets/blenderB4.png";
+import blenderB5 from "./assets/blenderB5.png";
+
+// Character/Concept Design
+import blenderC from "./assets/blenderC.png";
+import blenderC1 from "./assets/blenderC1.png";
+import blenderC2 from "./assets/blenderC2.png";
+import blenderC3 from "./assets/blenderC3.png";
 
 // --- AnimatedSection Component ---
 // This component wraps its children, applying animations when it scrolls into view.
-
-// Default animation variants:
-// 'hidden': defines the state of the component before it animates (opacity 0, slightly moved down).
-// 'visible': defines the state of the component after it animates (opacity 1, at its original y-position).
 const defaultVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
 
-/**
- * AnimatedSection Component
- * Wraps content to animate it when it scrolls into view.
- *
- * @param {React.ReactNode} children - The content to be animated.
- * @param {string} [className=""] - Optional additional CSS classes for the section.
- * @param {string} [id] - Optional HTML ID for the section.
- * @param {object} [variants=defaultVariants] - Animation variants for hidden and visible states.
- * @param {number} [delay=0] - Delay in seconds before the animation starts.
- * @param {number} [threshold=0.1] - Percentage of the element that needs to be in view to trigger the animation.
- */
 const AnimatedSection = ({
   children,
   className = "",
@@ -79,51 +85,34 @@ const AnimatedSection = ({
   delay = 0,
   threshold = 0.1,
 }) => {
-  // 'useAnimation' hook from framer-motion to control the animation sequence.
   const controls = useAnimation();
-
-  // 'useInView' hook to track if the component is in the viewport.
-  // 'ref' is attached to the element we want to observe.
-  // 'inView' is a boolean indicating if the element is in view.
-  // 'triggerOnce: true' ensures the animation only runs once.
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: threshold,
   });
 
-  // 'useEffect' hook to start the animation when the component comes into view.
-  // This effect runs when 'controls' or 'inView' changes.
   useEffect(() => {
-    // If the component is in view, start the 'visible' animation.
     if (inView) {
       controls.start("visible");
     }
-  }, [controls, inView]); // Dependencies for the effect.
+  }, [controls, inView]);
 
-  // The 'motion.div' component from framer-motion is used here.
-  // It's like a regular <div> tag but with animation capabilities.
   return (
     <motion.div
-      ref={ref} // Assign the ref from useInView to this element.
+      ref={ref}
       id={id}
       className={className}
-      initial="hidden" // Set the initial animation state.
-      animate={controls} // Control the animation using the 'controls' object.
-      variants={variants} // Provide the animation variants (hidden and visible states).
-      transition={{ duration: 0.6, delay }} // Define the transition properties (duration and delay).
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      transition={{ duration: 0.6, delay }}
     >
-      {children} {/* Render the content passed to this component. */}
+      {children}
     </motion.div>
   );
 };
 
 // --- Reusable Helper Components ---
-
-/**
- * Section Component
- * This is a reusable component that creates a styled section on the page.
- * It takes 'title', 'icon', 'children', and 'id' as "props" (properties/settings).
- */
 const Section = ({ title, icon: IconComponent, children, id }) => (
   <section
     id={id}
@@ -141,15 +130,13 @@ const Section = ({ title, icon: IconComponent, children, id }) => (
   </section>
 );
 
-/**
- * ProjectCard Component
- * This component displays a card for a single project.
- */
+// Updated ProjectCard to use actual images for Blender projects
 const ProjectCard = ({
   title,
   description,
-  imagePlaceholderColor,
-  images,
+  mainImage, // Prop for the main display image (for Blender projects)
+  galleryImages, // Prop for the array of gallery images (for Blender projects)
+  imagePlaceholderColor, // Kept for CLI projects or as a fallback
   link,
   type,
   isGalleryOpen,
@@ -164,33 +151,54 @@ const ProjectCard = ({
 
   const nextImage = (e) => {
     e.stopPropagation();
-    if (images && images.length > 0) {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    if (galleryImages && galleryImages.length > 0) {
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex + 1) % galleryImages.length,
+      );
     }
   };
 
   const prevImage = (e) => {
     e.stopPropagation();
-    if (images && images.length > 0) {
+    if (galleryImages && galleryImages.length > 0) {
       setCurrentImageIndex(
-        (prevIndex) => (prevIndex - 1 + images.length) % images.length,
+        (prevIndex) =>
+          (prevIndex - 1 + galleryImages.length) % galleryImages.length,
       );
     }
   };
 
   useEffect(() => {
     if (type === "blender" && !isGalleryOpen) {
-      setCurrentImageIndex(0);
+      setCurrentImageIndex(0); // Reset gallery index when it's closed
     }
   }, [isGalleryOpen, type]);
 
+  // Fallback for image loading errors
+  const imageErrorHandler = (e) => {
+    e.target.onerror = null; // Prevents infinite loop if placeholder also fails
+    e.target.src = `https://placehold.co/600x400/CCCCCC/FFFFFF?text=Image+Not+Found`;
+  };
+
   return (
     <div className="bg-emerald-50 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
-      <div
-        className={`w-full h-48 md:h-56 rounded-md flex items-center justify-center text-white text-xl font-semibold mb-4 ${imagePlaceholderColor}`}
-      >
-        {type === "blender" ? <Palette size={48} /> : <Code size={48} />}
-      </div>
+      {/* Main visual: Use <img> for Blender, div with icon for CLI */}
+      {type === "blender" && mainImage ? (
+        <img
+          src={mainImage}
+          alt={title}
+          className="w-full h-48 md:h-56 rounded-md object-cover mb-4 shadow-lg"
+          onError={imageErrorHandler}
+        />
+      ) : (
+        <div
+          className={`w-full h-48 md:h-56 rounded-md flex items-center justify-center text-white text-xl font-semibold mb-4 ${imagePlaceholderColor || "bg-gray-400"}`}
+        >
+          {/* Display appropriate icon based on type if no image */}
+          {type === "blender" ? <Palette size={48} /> : <Code size={48} />}
+        </div>
+      )}
+
       <h3 className="text-xl md:text-2xl font-semibold text-emerald-800 mb-2">
         {title}
       </h3>
@@ -217,8 +225,8 @@ const ProjectCard = ({
 
       <div className="mt-auto">
         {type === "blender" &&
-          images &&
-          images.length > 0 &&
+          galleryImages && // Check for galleryImages before showing button
+          galleryImages.length > 0 &&
           onToggleGallery && (
             <button
               onClick={onToggleGallery}
@@ -244,54 +252,52 @@ const ProjectCard = ({
         )}
       </div>
 
-      {type === "blender" && isGalleryOpen && images && images.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-emerald-200">
-          <div className="relative mb-2">
-            <div
-              className={`w-full h-56 md:h-72 rounded-md flex items-center justify-center text-white text-xl font-semibold ${images[currentImageIndex]} shadow-inner`}
-            >
-              Image {currentImageIndex + 1} <br /> (Placeholder:{" "}
-              {images[currentImageIndex]})
+      {/* Inline Image Gallery for Blender projects */}
+      {type === "blender" &&
+        isGalleryOpen &&
+        galleryImages &&
+        galleryImages.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-emerald-200">
+            <div className="relative mb-2">
+              <img
+                src={galleryImages[currentImageIndex]}
+                alt={`${title} - Gallery Image ${currentImageIndex + 1}`}
+                className="w-full h-56 md:h-72 rounded-md object-cover shadow-inner bg-gray-200" // Added bg-gray-200 for loading
+                onError={imageErrorHandler}
+              />
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
+                    aria-label="Previous Image"
+                  >
+                    <ArrowLeftCircle size={20} />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
+                    aria-label="Next Image"
+                  >
+                    <ArrowRightCircle size={20} />
+                  </button>
+                </>
+              )}
             </div>
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
-                  aria-label="Previous Image"
-                >
-                  <ArrowLeftCircle size={20} />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
-                  aria-label="Next Image"
-                >
-                  <ArrowRightCircle size={20} />
-                </button>
-              </>
+            {galleryImages.length > 1 && (
+              <p className="text-center text-xs text-emerald-500">
+                Image {currentImageIndex + 1} of {galleryImages.length}
+              </p>
             )}
           </div>
-          {images.length > 1 && (
-            <p className="text-center text-xs text-emerald-500">
-              Image {currentImageIndex + 1} of {images.length}
-            </p>
-          )}
-        </div>
-      )}
+        )}
     </div>
   );
 };
 
 // --- Page Sections ---
-
-/**
- * Navbar Component
- * Creates the sticky navigation bar with animated links.
- */
 const Navbar = ({ setActiveSection }) => {
   const [isOpen, setIsOpen] = useState(false);
-
   const navLinks = [
     { id: "home", label: "Home" },
     { id: "scientist", label: "Career & Education" },
@@ -300,16 +306,13 @@ const Navbar = ({ setActiveSection }) => {
     { id: "cli", label: "CLI Tools" },
     { id: "contact", label: "Contact" },
   ];
-
-  // Subtler wiggle animation for navbar links on hover
   const navLinkHoverAnimation = {
-    rotate: [0, -1.5, 1.5, -1.5, 1.5, 0], // Reduced rotation
-    scale: 1.03, // Slightly reduced scale
+    rotate: [0, -1.5, 1.5, -1.5, 1.5, 0],
+    scale: 1.03,
     transition: { duration: 0.35, ease: "easeInOut" },
   };
-  // Subtler wiggle animation for the brand/name link
   const brandHoverAnimation = {
-    scale: [1, 1.02, 1, 1.02, 1], // Reduced scale
+    scale: [1, 1.02, 1, 1.02, 1],
     color: ["#FFFFFF", "#A7F3D0", "#FFFFFF"],
     transition: { duration: 0.5, ease: "easeInOut" },
   };
@@ -323,7 +326,7 @@ const Navbar = ({ setActiveSection }) => {
               src={profilePic}
               alt="Filipe L. Q. Junqueira"
               className="w-10 h-10 rounded-full mr-3 object-cover shadow-inner"
-              whileHover={{ scale: 1.1, rotate: 5 }} // Reduced scale and rotate
+              whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             />
             <motion.a
@@ -399,7 +402,6 @@ const Navbar = ({ setActiveSection }) => {
           </div>
         </div>
       </div>
-
       {isOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -424,11 +426,6 @@ const Navbar = ({ setActiveSection }) => {
   );
 };
 
-/**
- * HeroSection Component
- * The main introductory section with entry animations on its elements.
- * The "View Full CV" button now links to the imported PDF.
- */
 const HeroSection = () => (
   <section
     id="home"
@@ -474,11 +471,10 @@ const HeroSection = () => (
         Exploring 3D printing with atoms, NC-AFM & STM studies, DFT, and Machine
         Learning in nanoscience.
       </motion.p>
-      {/* "View Full CV" button now links to the imported filipeCv PDF */}
       <motion.a
-        href={filipeCv} // Use the imported PDF path here
-        target="_blank" // Opens the PDF in a new tab
-        rel="noopener noreferrer" // Security measure for new tabs
+        href={filipeCv}
+        target="_blank"
+        rel="noopener noreferrer"
         className="bg-white text-emerald-600 font-bold py-3 px-8 rounded-lg text-lg hover:bg-emerald-50 transition-colors duration-300 shadow-lg hover:shadow-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -496,41 +492,35 @@ const HeroSection = () => (
   </section>
 );
 
-/**
- * BlenderCreations Component
- * Showcases Blender projects with staggered card animations.
- */
+// Updated BlenderCreations to use imported images
 const BlenderCreations = () => {
   const [expandedGalleryId, setExpandedGalleryId] = useState(null);
+
+  // Updated project data with imported image variables
   const blenderProjects = [
     {
       id: 1,
       title: "Abstract 3D Art",
       description:
         "Exploring forms, textures, and lighting using Blender for creating visually compelling abstract scenes. This involves procedural texturing and complex node setups.",
-      images: ["bg-sky-500", "bg-sky-600", "bg-sky-700"],
-      cardVisual: "bg-sky-400",
+      mainImage: blenderA,
+      galleryImages: [blenderA1, blenderA2, blenderA3],
     },
     {
       id: 2,
       title: "Scientific Visualization",
       description:
         "Using Blender to create visualizations for complex scientific concepts, such as molecular structures or physical phenomena, making them accessible and understandable.",
-      images: ["bg-orange-500", "bg-orange-600"],
-      cardVisual: "bg-orange-400",
+      mainImage: blenderB,
+      galleryImages: [blenderB1, blenderB2, blenderB3, blenderB4, blenderB5],
     },
     {
       id: 3,
       title: "Character/Concept Design",
       description:
         "Developing unique characters and concepts in 3D, from initial sculpting to final texturing and rigging for animation or static renders.",
-      images: [
-        "bg-purple-500",
-        "bg-purple-600",
-        "bg-purple-700",
-        "bg-purple-800",
-      ],
-      cardVisual: "bg-purple-400",
+      mainImage: blenderC,
+      galleryImages: [blenderC1, blenderC2, blenderC3],
     },
   ];
 
@@ -554,8 +544,9 @@ const BlenderCreations = () => {
             <ProjectCard
               title={project.title}
               description={project.description}
-              imagePlaceholderColor={project.cardVisual}
-              images={project.images}
+              mainImage={project.mainImage} // Pass the main image
+              galleryImages={project.galleryImages} // Pass the gallery images
+              // imagePlaceholderColor is no longer primary for Blender, but can be a fallback if mainImage fails (handled in ProjectCard)
               type="blender"
               isGalleryOpen={expandedGalleryId === project.id}
               onToggleGallery={() => handleToggleGallery(project.id)}
@@ -570,10 +561,6 @@ const BlenderCreations = () => {
   );
 };
 
-/**
- * CLIPrograms Component
- * Showcases CLI tools with staggered card animations.
- */
 const CLIPrograms = () => {
   const cliProjects = [
     {
@@ -601,7 +588,6 @@ const CLIPrograms = () => {
       githubLink: "https://github.com/filipejunqueira",
     },
   ];
-
   return (
     <Section title="CLI Tools & Scripts" icon={Cpu} id="cli">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
@@ -619,23 +605,17 @@ const CLIPrograms = () => {
             <ProjectCard
               title={project.title}
               description={project.description}
-              imagePlaceholderColor={project.imagePlaceholderColor}
+              imagePlaceholderColor={project.imagePlaceholderColor} // CLI projects still use placeholder colors
               link={project.githubLink}
               type="cli"
             />
           </AnimatedSection>
         ))}
       </div>
-      {/* Removed the redundant GitHub profile link text from here */}
     </Section>
   );
 };
 
-/**
- * ScientistCareer Component
- * Details career and education milestones with staggered animations and animated expand/collapse.
- * Removed the duplicate "Download Full CV" button.
- */
 const ScientistCareer = () => {
   const [expandedDetailId, setExpandedDetailId] = useState(null);
   const careerMilestones = [
@@ -729,13 +709,11 @@ const ScientistCareer = () => {
         "Focused on Group Theory and Galois Theory. Participated in weekly seminars and worked on problem sets that extended beyond the standard undergraduate curriculum, fostering a deeper understanding of mathematical proofs and structures.",
     },
   ];
-
   const handleToggleDetail = (milestoneId) => {
     setExpandedDetailId((prevId) =>
       prevId === milestoneId ? null : milestoneId,
     );
   };
-
   return (
     <Section title="Career & Education" icon={Briefcase} id="scientist">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
@@ -806,21 +784,15 @@ const ScientistCareer = () => {
           );
         })}
       </div>
-      {/* The "Download Full CV" button that was here has been removed. */}
     </Section>
   );
 };
 
-/**
- * PublicationItem Component
- * Renders a single publication entry with AI explanation feature and animated expand/collapse.
- */
 const PublicationItem = ({ pub }) => {
   const [summary, setSummary] = useState("");
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const [summaryError, setSummaryError] = useState("");
   const [showSummary, setShowSummary] = useState(false);
-
   const handleGenerateSummary = async () => {
     if (summary && !showSummary) {
       setShowSummary(true);
@@ -830,32 +802,21 @@ const PublicationItem = ({ pub }) => {
       setShowSummary(false);
       return;
     }
-
     setIsLoadingSummary(true);
     setSummaryError("");
     setSummary("");
     setShowSummary(true);
-
-    const prompt = `Please provide a concise summary or explain the significance of the following scientific publication in 2-3 sentences, suitable for a general audience. Focus on the key findings or impact:
-Title: "${pub.title}"
-Authors: ${pub.authors}
-Journal: ${pub.journal}
-Year: ${pub.year}
-${pub.note ? `Note: ${pub.note}` : ""}
-What are the main takeaways or importance of this research?`;
-
+    const prompt = `Please provide a concise summary or explain the significance of the following scientific publication in 2-3 sentences, suitable for a general audience. Focus on the key findings or impact:\nTitle: "${pub.title}"\nAuthors: ${pub.authors}\nJournal: ${pub.journal}\nYear: ${pub.year}\n${pub.note ? `Note: ${pub.note}` : ""}\nWhat are the main takeaways or importance of this research?`;
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKey = "";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
+    const apiKeyGen = ""; // Gemini API Key
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyGen}`;
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Gemini API Error:", errorData);
@@ -886,7 +847,6 @@ What are the main takeaways or importance of this research?`;
       setIsLoadingSummary(false);
     }
   };
-
   return (
     <div className="bg-emerald-50 p-5 rounded-lg shadow-sm">
       <h3 className="text-lg md:text-xl font-semibold text-emerald-800 mb-1">
@@ -921,7 +881,6 @@ What are the main takeaways or importance of this research?`;
               : "✨ Explain with AI"}
         </button>
       </div>
-
       {showSummary && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -964,10 +923,6 @@ What are the main takeaways or importance of this research?`;
   );
 };
 
-/**
- * PublicationsSection Component
- * Lists scientific publications with staggered animations.
- */
 const PublicationsSection = () => {
   const publications = [
     {
@@ -1014,7 +969,6 @@ const PublicationsSection = () => {
       note: "A DFT study.",
     },
   ];
-
   return (
     <Section title="Selected Publications" icon={BookOpen} id="publications">
       <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
@@ -1032,10 +986,6 @@ const PublicationsSection = () => {
   );
 };
 
-/**
- * HoverFlipButton Component
- * A reusable button with a hover effect that flips its content.
- */
 const HoverFlipButton = ({
   href,
   IconInitial,
@@ -1047,7 +997,6 @@ const HoverFlipButton = ({
   ariaLabel,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-
   return (
     <a
       href={href}
@@ -1065,7 +1014,7 @@ const HoverFlipButton = ({
         >
           {IconInitial && (
             <IconInitial size={20} className="mr-2 flex-shrink-0" />
-          )}
+          )}{" "}
           <span className="truncate">{textInitial}</span>
         </span>
         <span
@@ -1079,10 +1028,6 @@ const HoverFlipButton = ({
   );
 };
 
-/**
- * ContactSection Component
- * Provides contact information with animated buttons.
- */
 const ContactSection = () => {
   const contactButtons = [
     {
@@ -1124,7 +1069,6 @@ const ContactSection = () => {
       ariaLabel: "Filipe Junqueira on GitHub",
     },
   ];
-
   return (
     <Section title="Get In Touch" icon={Users} id="contact">
       <p className="text-center text-lg text-emerald-600 mb-8 md:mb-10 max-w-xl mx-auto">
@@ -1142,10 +1086,6 @@ const ContactSection = () => {
   );
 };
 
-/**
- * Footer Component
- * The footer at the bottom of the page.
- */
 const Footer = () => (
   <footer className="bg-emerald-700 text-emerald-100 py-8 text-center">
     <div className="container mx-auto">
@@ -1160,15 +1100,12 @@ const Footer = () => (
   </footer>
 );
 
-// --- Main App Component ---
 function App() {
   const [activeSection, setActiveSection] = useState("home");
-
   useEffect(() => {
     const hash = window.location.hash.substring(1);
     const sectionIdToScroll =
       hash || (activeSection !== "home" ? activeSection : null);
-
     if (sectionIdToScroll) {
       const element = document.getElementById(sectionIdToScroll);
       if (element) {
@@ -1176,15 +1113,12 @@ function App() {
         const elementPosition =
           element.getBoundingClientRect().top + window.pageYOffset;
         const offsetPosition = elementPosition - navbarHeight - 20;
-
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       }
     } else if (activeSection === "home" && !hash) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [activeSection]);
-
-  // Animation variants for main sections
   const fadeInFromLeft = {
     hidden: { opacity: 0, x: -50 },
     visible: {
@@ -1193,7 +1127,6 @@ function App() {
       transition: { type: "spring", stiffness: 50 },
     },
   };
-
   const fadeInFromRight = {
     hidden: { opacity: 0, x: 50 },
     visible: {
@@ -1202,7 +1135,6 @@ function App() {
       transition: { type: "spring", stiffness: 50 },
     },
   };
-
   return (
     <div className="font-sans bg-emerald-100 min-h-screen">
       <Navbar setActiveSection={setActiveSection} />
@@ -1215,7 +1147,6 @@ function App() {
         >
           <ScientistCareer />
         </AnimatedSection>
-
         <AnimatedSection
           id="publications-animated-wrapper"
           variants={defaultVariants}
@@ -1223,7 +1154,6 @@ function App() {
         >
           <PublicationsSection />
         </AnimatedSection>
-
         <AnimatedSection
           id="blender-animated-wrapper"
           variants={fadeInFromRight}
@@ -1231,7 +1161,6 @@ function App() {
         >
           <BlenderCreations />
         </AnimatedSection>
-
         <AnimatedSection
           id="cli-animated-wrapper"
           variants={defaultVariants}
@@ -1239,7 +1168,6 @@ function App() {
         >
           <CLIPrograms />
         </AnimatedSection>
-
         <AnimatedSection
           id="contact-animated-wrapper"
           variants={fadeInFromLeft}

@@ -38,8 +38,7 @@ jobs:
           cache: "npm" # Or 'yarn' or 'pnpm' depending on your package manager
 
       - name: Install dependencies
-        # Updated this line to include --legacy-peer-deps
-        run: npm install --legacy-peer-deps
+        run: npm install # Or 'yarn install' or 'pnpm install'
 
       - name: Build
         run: npm run build # Or 'yarn build' or 'pnpm build'. This runs the build script from your package.json

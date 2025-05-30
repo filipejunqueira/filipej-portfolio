@@ -10,6 +10,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 // This line imports various icon components from the 'lucide-react' library.
+// Each name (Briefcase, Code, etc.) is an icon. 'Image as ImageIcon' renames 'Image' to 'ImageIcon' to avoid naming conflicts.
 import {
   Briefcase,
   Code,
@@ -39,14 +40,16 @@ import {
   Loader2,
   AlertTriangle,
   UserCircle,
-  Terminal,
-  BarChart3,
-  Zap,
-  FileCode,
+  Terminal, // Added for new CLI section
+  BarChart3, // Added for new CLI section
+  Zap, // Added for new CLI section
+  FileCode, // Added for new CLI section
 } from "lucide-react";
 
 // Import your profile picture
+// Make sure the path is correct. If 'assets' is in 'src', this should work.
 import profilePic from "./assets/captainbroccoli.png";
+
 // Import your CV PDF file from the assets folder
 import filipeCv from "./assets/filipecv.pdf";
 
@@ -81,12 +84,17 @@ const AnimatedSection = ({
   threshold = 0.1,
 }) => {
   const controls = useAnimation();
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: threshold,
+  });
+
   useEffect(() => {
     if (inView) {
       controls.start("visible");
     }
   }, [controls, inView]);
+
   return (
     <motion.div
       ref={ref}
@@ -103,21 +111,15 @@ const AnimatedSection = ({
 };
 
 // --- Reusable Helper Components ---
-// Section Component: Applies Material-like elevation and typography for section titles
 const Section = ({ title, icon: IconComponent, children, id }) => (
   <section
     id={id}
-    // Consistent padding, rounded corners, and a prominent shadow (Material elevation)
-    className="py-16 md:py-20 bg-white rounded-xl shadow-xl mb-12 md:mb-16 px-6 md:px-10"
+    className="py-12 md:py-16 bg-white rounded-xl shadow-lg mb-8 md:mb-12 px-6 md:px-10"
   >
     <div className="container mx-auto">
-      {/* Section Title: Larger, medium weight, consistent with Material H5/H4 */}
-      <h2 className="text-3xl sm:text-4xl font-medium text-emerald-700 mb-10 md:mb-14 text-center flex items-center justify-center">
+      <h2 className="text-3xl md:text-4xl font-bold text-emerald-700 mb-8 md:mb-12 text-center flex items-center justify-center">
         {IconComponent && (
-          <IconComponent
-            className="w-8 h-8 sm:w-10 sm:h-10 mr-3 text-emerald-500"
-            strokeWidth={2}
-          />
+          <IconComponent className="w-8 h-8 md:w-10 md:h-10 mr-3 text-emerald-500" />
         )}
         {title}
       </h2>
@@ -126,8 +128,8 @@ const Section = ({ title, icon: IconComponent, children, id }) => (
   </section>
 );
 
-// ProjectCard (for Blender projects) with Material-inspired styling
 const ProjectCard = ({
+  // This is for Blender projects, CLI section will have its own card structure
   title,
   description,
   mainImage,
@@ -159,53 +161,45 @@ const ProjectCard = ({
   }, [isGalleryOpen, type]);
   const imageErrorHandler = (e) => {
     e.target.onerror = null;
-    e.target.src = `https://placehold.co/600x400/E0E0E0/BDBDBD?text=Image+Not+Found`;
+    e.target.src = `https://placehold.co/600x400/CCCCCC/FFFFFF?text=Image+Not+Found`;
   };
 
   return (
-    // Card Styling: Softer resting shadow, lifts more on hover, consistent padding.
-    <div className="bg-emerald-50 p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+    <div className="bg-emerald-50 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
       {type === "blender" && mainImage ? (
         <img
           src={mainImage}
           alt={title}
-          className="w-full h-52 md:h-60 rounded-md object-cover mb-5 shadow-sm"
+          className="w-full h-48 md:h-56 rounded-md object-cover mb-4 shadow-lg"
           onError={imageErrorHandler}
         />
       ) : (
         <div
-          className={`w-full h-52 md:h-60 rounded-md flex items-center justify-center text-white text-xl font-semibold mb-5 ${imagePlaceholderColor || "bg-gray-300"}`}
+          className={`w-full h-48 md:h-56 rounded-md flex items-center justify-center text-white text-xl font-semibold mb-4 ${imagePlaceholderColor || "bg-gray-400"}`}
         >
-          {type === "blender" ? (
-            <Palette size={52} strokeWidth={1.5} />
-          ) : (
-            <Code size={52} strokeWidth={1.5} />
-          )}
+          {type === "blender" ? <Palette size={48} /> : <Code size={48} />}
         </div>
       )}
-      {/* Card Title: Material H6/Subtitle1 equivalent */}
-      <h3 className="text-xl md:text-2xl font-medium text-emerald-800 mb-3">
+      <h3 className="text-xl md:text-2xl font-semibold text-emerald-800 mb-2">
         {title}
       </h3>
-      {/* Body Text: Consistent size, slightly darker for readability */}
       <div className="flex-grow">
         <p
-          className={`text-gray-700 text-sm md:text-base mb-4 ${isDescriptionExpanded ? "" : "line-clamp-3"}`}
+          className={`text-emerald-600 mb-4 ${isDescriptionExpanded ? "" : "line-clamp-3"}`}
         >
           {description}
         </p>
       </div>
       {description.length > 100 && (
-        // Button Text: Material button style (medium weight, slightly smaller)
         <button
           onClick={toggleDescription}
-          className="text-emerald-600 hover:text-emerald-800 flex items-center mb-4 text-sm font-medium self-start"
+          className="text-emerald-500 hover:text-emerald-700 flex items-center mb-3 text-sm self-start"
         >
           {isDescriptionExpanded ? "Show Less" : "Show More"}
           {isDescriptionExpanded ? (
-            <ChevronUp size={18} className="ml-1" />
+            <ChevronUp size={16} className="ml-1" />
           ) : (
-            <ChevronDown size={18} className="ml-1" />
+            <ChevronDown size={16} className="ml-1" />
           )}
         </button>
       )}
@@ -216,7 +210,7 @@ const ProjectCard = ({
           onToggleGallery && (
             <button
               onClick={onToggleGallery}
-              className="inline-flex items-center text-emerald-600 hover:text-emerald-800 font-medium transition-colors duration-300 self-start mr-4 text-sm"
+              className="inline-flex items-center text-emerald-500 hover:text-emerald-700 font-medium transition-colors duration-300 self-start mr-4"
             >
               {isGalleryOpen ? "Hide Images" : "View Images"}
               {isGalleryOpen ? (
@@ -225,6 +219,17 @@ const ProjectCard = ({
                 <ImageIcon size={18} className="ml-2" />
               )}
             </button>
+          )}
+        {type === "cli" &&
+          link && ( // This part is for the OLD CLI card, new one is in CLIToolsSection
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-emerald-500 hover:text-emerald-700 font-medium transition-colors duration-300 self-start"
+            >
+              View on GitHub <Github size={18} className="ml-2" />
+            </a>
           )}
       </div>
       {type === "blender" &&
@@ -236,30 +241,30 @@ const ProjectCard = ({
               <img
                 src={galleryImages[currentImageIndex]}
                 alt={`${title} - Gallery Image ${currentImageIndex + 1}`}
-                className="w-full h-60 md:h-72 rounded-md object-cover shadow-inner bg-gray-100"
+                className="w-full h-56 md:h-72 rounded-md object-cover shadow-inner bg-gray-200"
                 onError={imageErrorHandler}
               />
               {galleryImages.length > 1 && (
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
                     aria-label="Previous Image"
                   >
-                    <ArrowLeftCircle size={22} />
+                    <ArrowLeftCircle size={20} />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white p-1.5 rounded-full hover:bg-opacity-60 transition-opacity"
                     aria-label="Next Image"
                   >
-                    <ArrowRightCircle size={22} />
+                    <ArrowRightCircle size={20} />
                   </button>
                 </>
               )}
             </div>
             {galleryImages.length > 1 && (
-              <p className="text-center text-xs text-gray-600">
+              <p className="text-center text-xs text-emerald-500">
                 Image {currentImageIndex + 1} of {galleryImages.length}
               </p>
             )}
@@ -280,7 +285,6 @@ const Navbar = ({ setActiveSection }) => {
     { id: "cli", label: "CLI Tools" },
     { id: "contact", label: "Contact" },
   ];
-  // Navbar animations kept subtle as before
   const navLinkHoverAnimation = {
     rotate: [0, -1.5, 1.5, -1.5, 1.5, 0],
     scale: 1.03,
@@ -292,23 +296,21 @@ const Navbar = ({ setActiveSection }) => {
     transition: { duration: 0.5, ease: "easeInOut" },
   };
   return (
-    // Navbar: Prominent shadow for elevation
-    <nav className="bg-emerald-600 text-white sticky top-0 z-50 shadow-lg">
+    <nav className="bg-emerald-600 text-white sticky top-0 z-50 shadow-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <motion.img
               src={profilePic}
               alt="Filipe L. Q. Junqueira"
-              className="w-10 h-10 rounded-full mr-3 object-cover"
+              className="w-10 h-10 rounded-full mr-3 object-cover shadow-inner"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             />
-            {/* Brand Name: Slightly larger, medium weight */}
             <motion.a
               href="#home"
               onClick={() => setActiveSection("home")}
-              className="flex-shrink-0 text-xl md:text-2xl font-medium"
+              className="flex-shrink-0 text-xl md:text-2xl font-bold"
               whileHover={brandHoverAnimation}
             >
               Filipe L. Q. Junqueira
@@ -316,7 +318,6 @@ const Navbar = ({ setActiveSection }) => {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-1">
-              {/* Nav Links: Material Button typography (medium weight) */}
               {navLinks.map((link) => (
                 <motion.a
                   key={link.id}
@@ -325,7 +326,7 @@ const Navbar = ({ setActiveSection }) => {
                     setActiveSection(link.id);
                     setIsOpen(false);
                   }}
-                  className="hover:bg-emerald-700/50 px-3 py-2 rounded-md text-sm font-medium tracking-wide"
+                  className="hover:bg-emerald-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                   whileHover={navLinkHoverAnimation}
                 >
                   {link.label}
@@ -337,7 +338,7 @@ const Navbar = ({ setActiveSection }) => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="bg-emerald-700 inline-flex items-center justify-center p-2 rounded-md text-emerald-100 hover:text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-700 focus:ring-white"
+              className="bg-emerald-700 inline-flex items-center justify-center p-2 rounded-md text-emerald-300 hover:text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-700 focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={isOpen}
             >
@@ -390,7 +391,7 @@ const Navbar = ({ setActiveSection }) => {
                   setActiveSection(link.id);
                   setIsOpen(false);
                 }}
-                className="hover:bg-emerald-700/50 block px-3 py-2 rounded-md text-base font-medium tracking-wide"
+                className="hover:bg-emerald-500 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                 whileHover={navLinkHoverAnimation}
               >
                 {link.label}
@@ -406,15 +407,13 @@ const Navbar = ({ setActiveSection }) => {
 const HeroSection = () => (
   <section
     id="home"
-    className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white py-24 md:py-32"
+    className="bg-gradient-to-br from-emerald-400 to-teal-500 text-white py-20 md:py-32"
   >
-    {" "}
-    {/* Adjusted gradient */}
     <div className="container mx-auto text-center px-6 flex flex-col items-center">
       <motion.img
         src={profilePic}
         alt="Filipe L. Q. Junqueira profile"
-        className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover mb-8 shadow-2xl border-4 border-white/80"
+        className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover mb-6 shadow-lg border-4 border-white"
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{
@@ -424,18 +423,16 @@ const HeroSection = () => (
           stiffness: 120,
         }}
       />
-      {/* Hero Title: Material H3/H4 equivalent */}
       <motion.h1
-        className="text-4xl sm:text-5xl md:text-6xl font-light mb-6"
+        className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         Filipe L. Q. Junqueira
       </motion.h1>
-      {/* Subtitle: Material Subtitle1 equivalent */}
       <motion.p
-        className="text-lg sm:text-xl md:text-2xl font-normal mb-4 text-emerald-100 opacity-95"
+        className="text-lg sm:text-xl md:text-2xl mb-4 text-emerald-100 opacity-95"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
@@ -443,9 +440,8 @@ const HeroSection = () => (
         Research Associate, School of Physics and Astronomy, University of
         Nottingham
       </motion.p>
-      {/* Body Text */}
       <motion.p
-        className="text-base sm:text-lg md:text-xl mb-10 text-emerald-200 max-w-3xl mx-auto leading-relaxed"
+        className="text-md sm:text-lg md:text-xl mb-8 text-emerald-200 max-w-3xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
@@ -453,19 +449,18 @@ const HeroSection = () => (
         Exploring 3D printing with atoms, NC-AFM & STM studies, DFT, and Machine
         Learning in nanoscience.
       </motion.p>
-      {/* Contained Button: Material style */}
       <motion.a
         href={filipeCv}
         target="_blank"
         rel="noopener noreferrer"
-        className="bg-white text-emerald-600 font-medium py-3 px-8 rounded-md text-base uppercase tracking-wider hover:bg-emerald-50 transition-colors duration-300 shadow-md hover:shadow-lg"
+        className="bg-white text-emerald-600 font-bold py-3 px-8 rounded-lg text-lg hover:bg-emerald-50 transition-colors duration-300 shadow-lg hover:shadow-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 1.0 }}
         whileHover={{
           scale: 1.05,
           rotate: [0, -1, 1, -1, 1, 0],
-          boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
+          boxShadow: "0px 0px 15px rgba(255,255,255,0.5)",
           transition: { rotate: { duration: 0.3, ease: "easeInOut" } },
         }}
       >
@@ -507,8 +502,7 @@ const BlenderCreations = () => {
     setExpandedGalleryId((prevId) => (prevId === projectId ? null : projectId));
   return (
     <Section title="Blender Art & 3D Visualization" icon={Palette} id="blender">
-      {/* Section Intro: Material Body1 */}
-      <p className="text-center text-base md:text-lg text-gray-700 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
         Leveraging Blender for creative 3D projects, scientific visualization,
         and concept art. Each piece is a journey into form, light, and
         narrative, aiming to bridge the gap between the technical and the
@@ -530,8 +524,7 @@ const BlenderCreations = () => {
           </AnimatedSection>
         ))}
       </div>
-      {/* Caption Text */}
-      <p className="text-center text-sm text-gray-600 mt-12 md:mt-16">
+      <p className="text-center text-md text-emerald-500 mt-10 md:mt-12">
         More creations and visualizations coming soon! Stay tuned for updates on
         new projects and explorations.
       </p>
@@ -539,7 +532,9 @@ const BlenderCreations = () => {
   );
 };
 
+// --- NEW CLI TOOLS SECTION ---
 const CLIToolsSection = () => {
+  // Data for your CLI tools, adapt as needed
   const cliToolsData = [
     {
       id: 1,
@@ -587,23 +582,29 @@ const CLIToolsSection = () => {
       githubLink: "https://github.com/filipejunqueira/quickplot",
     },
   ];
+
+  // Refined animation variants for the CLI tool cards
   const cardVariants = {
-    // Refined card animations
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 30 }, // Start a bit lower and transparent
     visible: (i) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.12, duration: 0.5, ease: "easeInOut" },
+      transition: {
+        delay: i * 0.12, // Stagger delay for each card
+        duration: 0.5, // Smooth animation duration
+        ease: "easeInOut", // Gentle easing for a smoother feel
+      },
     }),
     hover: {
       y: -6,
       scale: 1.02,
       boxShadow: "0px 8px 20px rgba(16, 185, 129, 0.12)",
-    },
+    }, // Slightly more subtle hover
   };
+
   return (
     <Section title="CLI Tools & Scripts" icon={Terminal} id="cli">
-      <p className="text-center text-base md:text-lg text-gray-700 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <p className="text-center text-lg text-emerald-600 mb-12 md:mb-16 max-w-2xl mx-auto">
         Crafting efficient command-line interfaces to accelerate research and
         automate complex tasks in nanoscience and data analysis. These tools are
         designed for robustness and ease of use.
@@ -614,8 +615,7 @@ const CLIToolsSection = () => {
           return (
             <motion.div
               key={tool.id}
-              // CLI Card Styling: Consistent with Material card principles
-              className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col cursor-default border border-gray-200/80"
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-emerald-200/50 transition-all duration-300 flex flex-col cursor-default border border-emerald-100 hover:border-emerald-300"
               variants={cardVariants}
               initial="hidden"
               whileInView="visible"
@@ -623,46 +623,42 @@ const CLIToolsSection = () => {
               viewport={{ once: true, amount: 0.1 }}
               custom={index}
             >
-              <div className="flex items-center text-emerald-600 mb-4">
-                <ToolIcon className="h-9 w-9 mr-3.5 stroke-[1.75] flex-shrink-0" />
-                {/* CLI Card Title: Material H6/Subtitle1 */}
-                <h3 className="text-lg lg:text-xl font-medium text-emerald-800">
+              <div className="flex items-center text-emerald-600 mb-5">
+                <ToolIcon className="h-10 w-10 mr-4 stroke-1.5 flex-shrink-0" />
+                <h3 className="text-xl lg:text-2xl font-semibold text-emerald-800">
                   {tool.title}
                 </h3>
               </div>
-              {/* Body Text */}
-              <p className="text-gray-700 text-sm mb-5 flex-grow leading-relaxed">
+              <p className="text-emerald-700/90 mb-5 text-sm flex-grow leading-relaxed">
                 {tool.description}
               </p>
-              {/* Tags: Styled like chips */}
-              <div className="mb-5 flex flex-wrap gap-2">
+              <div className="mb-6 flex flex-wrap gap-2">
                 {tool.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium"
+                    className="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
               {tool.codeExample && (
-                <div className="bg-gray-800 text-gray-300 p-4 rounded-lg font-mono text-xs mb-5 overflow-x-auto shadow-inner">
+                <div className="bg-gray-800 text-gray-300 p-4 rounded-lg font-mono text-xs sm:text-sm mb-6 overflow-x-auto shadow-inner">
                   <pre className="whitespace-pre-wrap text-emerald-400">
                     {tool.codeExample}
                   </pre>
                 </div>
               )}
-              {/* Button: Material Contained Button style */}
               <motion.a
                 href={tool.githubLink || "https://github.com/filipejunqueira"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-500 text-white font-medium py-2.5 px-5 rounded-md hover:bg-emerald-600 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider"
+                className="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-500 text-white font-semibold py-2.5 px-5 rounded-lg hover:bg-emerald-600 transition-colors duration-300 shadow-md hover:shadow-lg"
                 whileHover={{
-                  scale: 1.03,
+                  scale: 1.05,
                   transition: { type: "spring", stiffness: 300, damping: 10 },
                 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Github size={18} /> View on GitHub
               </motion.a>
@@ -773,7 +769,7 @@ const ScientistCareer = () => {
     );
   return (
     <Section title="Career & Education" icon={Briefcase} id="scientist">
-      <p className="text-center text-base md:text-lg text-gray-700 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
         A journey through academia and industry, driven by a passion for
         physics, data, and problem-solving. Each step has been a building block
         towards new discoveries and innovations.
@@ -788,44 +784,36 @@ const ScientistCareer = () => {
               delay={index * 0.1}
               threshold={0.05}
             >
-              {/* Milestone Item: Material Card like structure */}
-              <div className="bg-emerald-50 p-6 rounded-lg shadow-lg">
-                {" "}
-                {/* Slightly more prominent shadow for these items */}
+              <div className="bg-emerald-50 p-6 rounded-lg shadow-md">
                 <div className="flex flex-col sm:flex-row items-start">
                   <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6 pt-1">
                     {MilestoneIcon && (
-                      <MilestoneIcon className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 strokeWidth={1.5}" />
+                      <MilestoneIcon className="w-10 h-10 md:w-12 md:h-12 text-emerald-500" />
                     )}
                   </div>
                   <div className="flex-grow">
-                    {/* Milestone Title */}
-                    <h3 className="text-xl md:text-2xl font-medium text-emerald-800">
+                    <h3 className="text-xl md:text-2xl font-semibold text-emerald-800">
                       {milestone.role}
                     </h3>
-                    {/* Subtitle */}
-                    <p className="text-base text-emerald-700 font-normal mt-1">
+                    <p className="text-md text-emerald-700 font-medium">
                       {milestone.institution}
                     </p>
-                    {/* Caption */}
-                    <p className="text-sm text-gray-600 mb-2 mt-0.5">
+                    <p className="text-sm text-emerald-500 mb-2">
                       {milestone.duration}
                     </p>
-                    {/* Body text */}
-                    <p className="text-gray-700 leading-relaxed text-base">
+                    <p className="text-emerald-600 leading-relaxed">
                       {milestone.description}
                     </p>
                     {milestone.moreDetails && (
                       <button
                         onClick={() => handleToggleDetail(milestone.id)}
-                        className="mt-4 text-sm text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center uppercase tracking-wider"
+                        className="mt-3 text-sm text-emerald-500 hover:text-emerald-700 font-semibold inline-flex items-center"
                       >
-                        {" "}
                         {isExpanded ? "Show Less" : "View More"}
                         {isExpanded ? (
-                          <ChevronUp size={18} className="ml-1" />
+                          <ChevronUp size={16} className="ml-1" />
                         ) : (
-                          <ChevronDown size={18} className="ml-1" />
+                          <ChevronDown size={16} className="ml-1" />
                         )}
                       </button>
                     )}
@@ -839,7 +827,7 @@ const ScientistCareer = () => {
                     transition={{ duration: 0.3 }}
                     className="mt-4 pt-4 border-t border-emerald-200"
                   >
-                    <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-line">
+                    <p className="text-emerald-600 leading-relaxed text-sm whitespace-pre-line">
                       {milestone.moreDetails}
                     </p>
                   </motion.div>
@@ -904,36 +892,30 @@ const PublicationItem = ({ pub }) => {
     }
   };
   return (
-    // Publication Item: Card-like with Material shadow
-    <div className="bg-emerald-50 p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-      {/* Publication Title: Material Subtitle1 / H6 */}
-      <h3 className="text-lg md:text-xl font-medium text-emerald-800 mb-1.5">
+    <div className="bg-emerald-50 p-5 rounded-lg shadow-sm">
+      <h3 className="text-lg md:text-xl font-semibold text-emerald-800 mb-1">
         {pub.title}
       </h3>
-      {/* Authors: Material Body2 / Caption */}
-      <p className="text-sm text-gray-700 italic mb-1 truncate-authors">
+      <p className="text-sm text-emerald-600 italic mb-1 truncate-authors">
         {pub.authors}
       </p>
-      {/* Journal & Year: Material Body2 */}
       <p className="text-sm text-emerald-700 mb-1">
         {pub.journal} ({pub.year})
       </p>
-      {/* Note: Material Caption */}
-      {pub.note && <p className="text-xs text-gray-600 mb-3">{pub.note}</p>}
-      <div className="flex flex-wrap items-center space-x-4 mt-3">
-        {/* Text Button Style */}
+      {pub.note && <p className="text-xs text-emerald-500 mb-2">{pub.note}</p>}
+      <div className="flex flex-wrap items-center space-x-4 mt-2">
         <a
           href={pub.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center mb-2 sm:mb-0 uppercase tracking-wider"
+          className="text-sm text-emerald-500 hover:text-emerald-700 hover:underline font-medium inline-flex items-center mb-2 sm:mb-0"
         >
-          View Publication <ExternalLink size={16} className="ml-1.5" />
+          View Publication <ExternalLink size={14} className="ml-1.5" />
         </a>
         <button
           onClick={handleGenerateSummary}
           disabled={isLoadingSummary}
-          className="text-sm text-purple-600 hover:text-purple-800 font-medium inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+          className="text-sm text-purple-600 hover:text-purple-800 font-medium inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Sparkles size={16} className="mr-1.5" />
           {isLoadingSummary
@@ -952,7 +934,7 @@ const PublicationItem = ({ pub }) => {
           className="mt-3 pt-3 border-t border-emerald-200"
         >
           {isLoadingSummary && (
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex items-center text-sm text-gray-500">
               <Loader2 size={18} className="animate-spin mr-2" />
               Generating explanation...
             </div>
@@ -968,10 +950,10 @@ const PublicationItem = ({ pub }) => {
           )}
           {summary && !isLoadingSummary && !summaryError && (
             <div>
-              <h4 className="text-sm font-medium text-emerald-700 mb-1">
+              <h4 className="text-sm font-semibold text-emerald-700 mb-1">
                 AI Explanation:
               </h4>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              <p className="text-sm text-emerald-600 whitespace-pre-wrap">
                 {summary}
               </p>
             </div>
@@ -1030,7 +1012,7 @@ const PublicationsSection = () => {
   ];
   return (
     <Section title="Selected Publications" icon={BookOpen} id="publications">
-      <p className="text-center text-base md:text-lg text-gray-700 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <p className="text-center text-lg text-emerald-600 mb-10 md:mb-12 max-w-2xl mx-auto">
         Contributing to the body of scientific knowledge through peer-reviewed
         research. These works explore topics from machine learning in microscopy
         to fundamental studies of molecular interactions. Click "Explain with
@@ -1059,25 +1041,22 @@ const HoverFlipButton = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   return (
-    // Button: Material Contained button style (uppercase, medium weight, specific padding)
     <a
       href={href}
       target={isExternal ? "_blank" : "_self"}
       rel={isExternal ? "noopener noreferrer" : ""}
-      className={`flex items-center justify-center font-medium py-2.5 px-5 rounded-md text-white transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105 w-full sm:w-auto min-h-[48px] text-sm uppercase tracking-wider ${bgColorInitial} ${bgColorHover}`}
+      className={`flex items-center justify-center font-semibold py-3 px-6 rounded-lg text-white transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105 w-full sm:w-auto min-h-[50px] ${bgColorInitial} ${bgColorHover}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       aria-label={ariaLabel || textInitial}
     >
-      <div className="relative w-full text-center overflow-hidden h-5">
-        {" "}
-        {/* Adjusted height for uppercase text */}
+      <div className="relative w-full text-center overflow-hidden h-6">
         <span
           className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${isHovered ? "opacity-0 -translate-y-full" : "opacity-100 translate-y-0"}`}
           aria-hidden={isHovered}
         >
           {IconInitial && (
-            <IconInitial size={18} className="mr-2 flex-shrink-0" />
+            <IconInitial size={20} className="mr-2 flex-shrink-0" />
           )}{" "}
           <span className="truncate">{textInitial}</span>
         </span>
@@ -1135,12 +1114,12 @@ const ContactSection = () => {
   ];
   return (
     <Section title="Get In Touch" icon={Users} id="contact">
-      <p className="text-center text-base md:text-lg text-gray-700 mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed">
+      <p className="text-center text-lg text-emerald-600 mb-8 md:mb-10 max-w-xl mx-auto">
         I'm always open to discussing new projects, collaborations, or just
         connecting with like-minded individuals. Whether it's about nanoscience,
         3D art, or software development, feel free to reach out!
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {contactButtons.map((button, index) => (
           <AnimatedSection key={index} delay={index * 0.1} threshold={0.1}>
             <HoverFlipButton {...button} />
@@ -1152,13 +1131,13 @@ const ContactSection = () => {
 };
 
 const Footer = () => (
-  <footer className="bg-emerald-700 text-emerald-100 py-10 text-center">
+  <footer className="bg-emerald-700 text-emerald-100 py-8 text-center">
     <div className="container mx-auto">
-      <p className="text-sm">
+      <p>
         &copy; {new Date().getFullYear()} Filipe L. Q. Junqueira. All rights
         reserved.
       </p>
-      <p className="text-xs mt-2 opacity-80">
+      <p className="text-sm mt-1">
         Crafted with React, Tailwind CSS, Framer Motion & Love :-)
       </p>
     </div>
@@ -1177,7 +1156,7 @@ function App() {
         const navbarHeight = document.querySelector("nav")?.offsetHeight || 0;
         const elementPosition =
           element.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementPosition - navbarHeight - 24; // Increased offset slightly
+        const offsetPosition = elementPosition - navbarHeight - 20;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       }
     } else if (activeSection === "home" && !hash) {
@@ -1189,7 +1168,7 @@ function App() {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { type: "spring", stiffness: 50, damping: 15 },
+      transition: { type: "spring", stiffness: 50 },
     },
   };
   const fadeInFromRight = {
@@ -1197,15 +1176,14 @@ function App() {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { type: "spring", stiffness: 50, damping: 15 },
+      transition: { type: "spring", stiffness: 50 },
     },
   };
   return (
-    // Applied font-sans here, which will be 'Open Sans' after tailwind.config.js update
-    <div className="font-sans bg-emerald-50/50 text-gray-800 min-h-screen">
+    <div className="font-sans bg-emerald-100 min-h-screen">
       <Navbar setActiveSection={setActiveSection} />
       <HeroSection />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatedSection
           id="scientist-animated-wrapper"
           variants={fadeInFromLeft}

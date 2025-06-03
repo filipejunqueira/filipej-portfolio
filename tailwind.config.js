@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 // Import the defaultTheme to access Tailwind's default font stack
-const defaultTheme = require("tailwindcss/defaultTheme");
+import defaultTheme from "tailwindcss/defaultTheme.js";
 
 export default {
   // Add darkMode strategy: 'class'

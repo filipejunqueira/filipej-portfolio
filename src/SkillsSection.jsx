@@ -26,35 +26,39 @@ const SkillsSection = () => {
   // Skills data.
   const skillsData = {
     computerSkills: [
+      { name: "C", icon: Code },
       { name: "Python", icon: Code },
+      { name: "Fortran", icon: Code },
       { name: "JavaScript (React, Node.js)", icon: Code },
       { name: "Tailwind CSS", icon: Code },
-      { name: "Framer Motion", icon: Code },
       { name: "Git & GitHub", icon: Github },
       { name: "Bash/Shell Scripting", icon: Terminal },
       { name: "SQL", icon: HardDrive },
-      { name: "C/C++ (Basic)", icon: Code },
+      { name: "C++(Basic)", icon: Code },
+      { name: "Docker (Basic)", icon: HardDrive },
+      { name: "Linux", icon: HardDrive },
     ],
     scientificTools: [
-      { name: "DFT (VASP, Quantum Espresso)", icon: Atom },
+      { name: "DFT (VASP, CP2K, Tetr, Lev00)", icon: Atom },
       { name: "SPM (AFM/STM) Analysis", icon: BarChart3 },
       { name: "Pymatgen", icon: FileCode },
       { name: "ASE (Atomic Simulation Environment)", icon: Atom },
       {
-        name: "Machine Learning (Scikit-learn, TensorFlow/Keras Basics)",
+        name: "Machine Learning (Scikit-learn, TensorFlow/Keras Basics, PyTorch Basics)",
         icon: Brain,
       },
       {
-        name: "Data Visualization (Matplotlib, Seaborn, Plotly)",
+        name: "Data Visualization (Matplotlib, Seaborn, Plotly etc)",
         icon: BarChart3,
       },
       { name: "Blender (3D Modeling & Visualization)", icon: Palette },
     ],
     languages: [
-      { name: "English", proficiency: "Fluent/C2" },
+      { name: "English", proficiency: "Fluent" },
       { name: "Portuguese", proficiency: "Native" },
-      { name: "French", proficiency: "Beginner/A2" },
-      { name: "Italian", proficiency: "Beginner/A1" },
+      { name: "Spanish", proficiency: "Conversational" },
+      { name: "French", proficiency: "Beginner" },
+      { name: "Italian", proficiency: "Beginner" },
     ],
   };
 

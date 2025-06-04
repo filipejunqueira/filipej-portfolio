@@ -11,7 +11,7 @@ import { Presentation, ExternalLink } from "lucide-react";
 const TeachingSection = () => {
   // Teaching experience points.
   const teachingPoints = [
-    "Extensive experience tutoring students for International Mathematics Olympiads (IMO), focusing on advanced problem-solving techniques in Number Theory, Combinatorics, Algebra, and Geometry.",
+    "Extensive experience tutoring students for Mathematics Olympiads (including IMO), focusing on advanced problem-solving techniques in Number Theory, Combinatorics, Algebra, and Geometry.",
     "Provided tailored coaching for IB (International Baccalaureate) Mathematics (HL/SL) and Physics (HL/SL), helping students achieve top grades and develop a deep understanding of core concepts.",
     "Developed custom learning materials and practice sets to address individual student needs and learning styles.",
     "Passionate about fostering critical thinking and a love for mathematics and physics in young minds.",

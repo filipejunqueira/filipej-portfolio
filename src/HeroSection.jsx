@@ -54,8 +54,8 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
       >
-        Exploring 3D printing with atoms, NC-AFM & STM studies, DFT, and Machine
-        Learning in nanoscience.
+        Density Functional Theory, 3D printing with atoms, NC-AFM & STM, and
+        Machine Learning in nanoscience.
       </motion.p>
       <motion.a
         href={filipeCv}

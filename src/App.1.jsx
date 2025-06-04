@@ -73,6 +73,7 @@ import {
   Lightbulb, // Icon for skills/ideas.
   Presentation, // Icon for teaching.
   Twitter, // Twitter/X social icon.
+  Send, // Send icon for form submit button
 } from "lucide-react";
 
 // --- Asset Imports ---
@@ -1905,31 +1906,65 @@ const HoverFlipButton = ({
 };
 
 /**
- * ContactSection Component: Displays contact information using HoverFlipButton.
+ * ContactSection Component: Displays contact information and a contact form.
  */
 const ContactSection = () => {
-  // Array of contact button configurations.
-  const contactButtons = [
-    {
-      href: "mailto:filipelqj@gmail.com",
-      IconInitial: Mail,
-      textInitial: "Personal Email",
-      textHover: "filipelqj@gmail.com",
-      bgColorInitial: "bg-red-500 dark:bg-red-600",
-      bgColorHover: "hover:bg-red-600 dark:hover:bg-red-700",
-      isExternal: false,
-      ariaLabel: "Email Filipe (Personal: filipelqj@gmail.com)",
-    },
-    {
-      href: "mailto:filipe.junqueira@nottingham.ac.uk",
-      IconInitial: Mail,
-      textInitial: "Work Email",
-      textHover: "filipe.junqueira@nottingham.ac.uk",
-      bgColorInitial: "bg-emerald-500 dark:bg-emerald-600",
-      bgColorHover: "hover:bg-emerald-600 dark:hover:bg-emerald-700",
-      isExternal: false,
-      ariaLabel: "Email Filipe (Work: filipe.junqueira@nottingham.ac.uk)",
-    },
+  // Initial state for form data
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  // State for submission status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // State for displaying messages after submission (e.g., success or error)
+  const [formMessage, setFormMessage] = useState("");
+
+  // Handles changes in form input fields
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handles form submission
+  const handleFormSubmit = async (e) => {
+    e.preventDefault(); // Prevents default browser form submission
+    setIsSubmitting(true);
+    setFormMessage(""); // Clear previous messages
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
+      setFormMessage("Please fill in all fields.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setFormMessage("Please enter a valid email address.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Placeholder for actual email sending logic
+    // In a real application, you would make an API call here to your backend or an email service
+    console.log("Form data submitted:", formData);
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    setIsSubmitting(false);
+    setFormMessage("Thank you for your message! I'll get back to you soon.");
+    // Optionally clear the form
+    setFormData({ name: "", email: "", message: "" });
+
+    // Hide the message after a few seconds
+    setTimeout(() => setFormMessage(""), 5000);
+  };
+
+  // Array of contact buttons, excluding email buttons
+  const socialContactButtons = [
     {
       href: "https://linkedin.com/in/filipejunqueira",
       IconInitial: Linkedin,
@@ -1953,21 +1988,117 @@ const ContactSection = () => {
       IconInitial: Twitter,
       textInitial: "Twitter / X",
       textHover: "@CaptBroccoli",
-      bgColorInitial: "bg-sky-500 dark:bg-sky-600", // Twitter blue.
+      bgColorInitial: "bg-sky-500 dark:bg-sky-600", // Twitter blue
       bgColorHover: "hover:bg-sky-600 dark:hover:bg-sky-700",
       ariaLabel: "Filipe Junqueira (Captain Broccoli) on Twitter/X",
     },
   ];
+
   return (
     <Section title="Get In Touch" icon={Users} id="contact">
       <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed">
         I'm always open to discussing new projects, collaborations, or just
-        connecting with like-minded individuals. Whether it's about nanoscience,
-        3D art, or software development, feel free to reach out!
+        connecting with like-minded individuals. Send me a message using the
+        form below, or connect via social media!
       </p>
-      {/* Grid layout for contact buttons, adjusted for 5 items. */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-        {contactButtons.map((button, index) => (
+
+      {/* Contact Form */}
+      <motion.div
+        className="max-w-xl mx-auto bg-white dark:bg-slate-800/50 p-6 sm:p-8 rounded-lg shadow-lg dark:shadow-slate-700/70 mb-12"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+            >
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value={formData.name}
+              onChange={handleFormChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
+              placeholder="Your Name"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+            >
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value={formData.email}
+              onChange={handleFormChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="message"
+              className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
+            >
+              Message
+            </label>
+            <textarea
+              name="message"
+              id="message"
+              rows="4"
+              value={formData.message}
+              onChange={handleFormChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
+              placeholder="Your message..."
+            ></textarea>
+          </div>
+          <div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={20} className="animate-spin mr-2" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={18} className="mr-2" />
+                  Send Message
+                </>
+              )}
+            </button>
+          </div>
+          {formMessage && (
+            <p
+              className={`text-sm mt-3 text-center ${formMessage.includes("Thank you") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+            >
+              {formMessage}
+            </p>
+          )}
+        </form>
+      </motion.div>
+
+      {/* Social Contact Buttons Grid */}
+      <p className="text-center text-base text-gray-700 dark:text-slate-300 mb-6 md:mb-8">
+        Or connect with me on social media:
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
+        {socialContactButtons.map((button, index) => (
           <AnimatedSection key={index} delay={index * 0.1} threshold={0.1}>
             <HoverFlipButton {...button} />
           </AnimatedSection>
@@ -2219,7 +2350,7 @@ function App() {
       setIsDarkMode(darkModeEnabled); // Set the dark mode state.
     };
     loadPreference();
-  }, [isAuthReady, db, userId, appId]); // Dependencies: Re-run if any of these change. (Added appId for completeness if it could change, though unlikely here)
+  }, [isAuthReady, db, userId]); // Dependencies: Re-run if any of these change. (Removed appId as it's constant after init)
 
   // --- Dark Mode Apply and Save Effect ---
   // This useEffect hook applies the dark mode class to the HTML document and saves the preference.
@@ -2283,12 +2414,19 @@ function App() {
         const offsetPosition = elementPosition - navbarHeight - 24; // 24px additional offset.
         // Scroll smoothly to the calculated position.
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        // Update activeSection state if scrolling due to hash, to keep nav in sync
+        if (hash && hash !== activeSection) {
+          setActiveSection(hash);
+        }
       }
     } else if (activeSection === "home" && !hash) {
       // If activeSection is 'home' and no hash in URL, scroll to the top of the page.
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [activeSection]); // Dependency: Re-run this effect when `activeSection` changes.
+  }, [
+    activeSection,
+    typeof window !== "undefined" ? window.location.hash : "",
+  ]); // Dependency: Re-run this effect when `activeSection` or hash changes.
 
   // Framer Motion animation variants for specific sections.
   const fadeInFromLeft = {

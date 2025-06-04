@@ -1,13 +1,49 @@
-# React + Vite
+# Filipe L. Q. Junqueira Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the source code for **[filipej.dev](https://filipej.dev)**, a single page portfolio site built with [React](https://react.dev/) and [Vite](https://vitejs.dev/). The website showcases research in nanoscience, Blender 3D artwork and several software projects.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React + Vite** for a fast development workflow
+- **Tailwind CSS** for styling and responsive layouts
+- **Framer Motion** animations
+- Dark mode toggle with the preference stored in `localStorage` and optionally in Firestore
+- Sections for skills, teaching, career & education, publications, Blender art, command line tools and contact details
 
-## Expanding the ESLint configuration
+## Local development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# filipej-portfolio
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Lint the codebase:
+   ```bash
+   npm run lint
+   ```
+4. Build a production version:
+   ```bash
+   npm run build
+   ```
+
+The resulting static files will be generated in the `dist/` directory.
+
+### Firebase configuration
+
+The site can optionally save user preferences to Firebase. When deploying you may expose two global variables before loading the application:
+
+```html
+<script>
+  window.__firebase_config = { /* your firebase config */ };
+  window.__app_id = 'my-portfolio';
+</script>
+```
+
+If no Firebase configuration is provided, dark mode will still work using `localStorage` only.
+
+## License
+
+This project is released under the [MIT License](LICENSE).

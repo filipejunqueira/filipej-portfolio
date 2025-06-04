@@ -27,22 +27,22 @@ const ScientistCareer = () => {
       id: 1,
       role: "Post-doctoral Researcher",
       institution: "University of Nottingham, UK",
-      duration: "Jan 2022 - Present",
+      duration: "September 2021 - Present",
       description:
-        "Research associate with Prof. Philip Moriarty's nanoscience group, focusing on atomic manipulation and machine learning applications in SPM.",
+        "Research associate with Prof. Philip Moriarty's nanoscience group, focusing on atomic manipulation, DFT and machine learning applications in SPM.",
       icon: FlaskConical,
       moreDetails: `Key responsibilities and achievements:
-      - Designed and executed advanced NC-AFM/STM experiments for single-atom/molecule manipulation.
-      - Developed Python-based analysis scripts, improving data processing efficiency by ~30%.
-      - Mentored 2 PhD students on experimental techniques and data interpretation.
-      - Investigating novel methodologies for creating 3D atomic structures.
+      - Designed and executed advanced NC-AFM/STM experiments for single-atom manipulation.
+      - Developed Python/bash-based analysis scripts, improving data processing efficiency.
+      - Contributed to pre and post analysis DFT software (Tetr, writen in Fortran).
+      - Investigating novel paths for creating 3D atomic structures.
       - Applied deep learning models for real-time image recognition in microscopy, enhancing feature identification speed.`,
     },
     {
       id: 2,
       role: "Physics PhD Researcher",
       institution: "University of Nottingham & King's College London, UK",
-      duration: "2016-2019, 2022-Present (Expected Submission: Mid 2025)",
+      duration: "2016-2019, 2022-Present (Expected Submission: Late 2025)",
       description:
         "Thesis: 'Towards 3D printing with atoms: Integrating machine learning with scanning probe microscopy for automated atomic assembly.'",
       icon: GraduationCap,
@@ -50,7 +50,8 @@ const ScientistCareer = () => {
       - Explored the intersection of nanoscience, DFT, and AI for atomic-scale fabrication.
       - Operated and maintained complex UHV SPM systems.
       - Performed DFT simulations (VASP) to model atomic interactions and guide experimental design.
-      - Developed bespoke machine learning algorithms (Python, TensorFlow) to control AFM tip movement for precise atomic placement, achieving X% improvement in placement accuracy.`,
+      - Developed bespoke machine learning algorithms (Python, TensorFlow) for several tasks, including image classification.
+      - Experience with cyclotron in particular, x-ray standing waves at Diamond Light Source, UK.`,
     },
     {
       id: 3,
@@ -61,10 +62,11 @@ const ScientistCareer = () => {
         "Analysed big data for clients in various sectors, providing actionable insights through statistical modeling and data visualization.",
       icon: Brain,
       moreDetails: `Key projects and responsibilities:
-      - Utilized R and Python (Pandas, Scikit-learn) for data mining, statistical analysis, and predictive modeling.
-      - Designed and implemented custom dashboards (e.g., using Plotly/Dash) for clients to monitor KPIs and identify trends.
-      - Delivered market segmentation analysis for a major retail client, leading to a Y% targeted marketing campaign improvement.
-      - Developed customer churn prediction models that identified at-risk customers with Z% accuracy.`,
+      - Data mining, statistical analysis, and predictive modeling.
+      - Designed and implemented custom dashboards (e.g., using Plotly/Dash) along with proprietary tools for clients to monitor KPIs and identify trends.
+      - Delivered market analysis and BI for Globo (Largest broadcaster in Brazil), Votorantim and BASF among others.
+      - Developed prediction models that identified customer sentiment.
+      - Collaborated directly with clients to understand their data needs. Was the first to implement Machine Learning models in the company, in particular Support Vector Machines.`,
     },
     {
       id: 4,
@@ -72,13 +74,13 @@ const ScientistCareer = () => {
       institution: "Family Business, São Paulo, Brazil",
       duration: "Jun 2013 - Dec 2014",
       description:
-        "Responsible for financial analysis, project viability assessment, and investor relations for a residential development project.",
+        "Responsible for financial analysis, project viability assessment, negotiations and due diligence for a closed residential development in Anapolis, Brazil.",
       icon: Building,
       moreDetails: `Contributions and outcomes:
-      - Managed project budgets and cash flow projections for a multi-unit residential development.
+      - Managed project budgets and cash flow projections.
       - Conducted thorough market research and competitor analysis to inform pricing and development strategies.
-      - Prepared comprehensive financial reports and presentations for stakeholders and potential investors.
-      - Successfully contributed to securing X amount in partial funding through targeted investor outreach.`,
+      - Conducted Negotiations and due diligence.
+      - Successfully contributed to securing the deal which later became Nature Home Resort at Anapolis Brazil`,
     },
     {
       id: 5,
@@ -86,12 +88,13 @@ const ScientistCareer = () => {
       institution: "BR Properties S.A., São Paulo, Brazil",
       duration: "Feb 2011 - May 2013",
       description:
-        "Financial viability analysis for commercial real estate acquisitions and development. Contributed to the creation of the intelligence department.",
+        "Investment and finantiall viability analysis for commercial real estate acquisitions and development. Created the intelligence department.",
       icon: Briefcase,
       moreDetails: `Key responsibilities and achievements:
-      - Developed and refined complex financial models (DCF, IRR, sensitivity analysis) for valuing commercial properties exceeding $Y million.
+      - Developed and refined complex financial models (DCF, IRR, sensitivity analysis) for valuing commercial properties, exceeding $20 million.
       - Conducted in-depth due diligence on potential acquisitions, identifying key risks and opportunities.
-      - Played an instrumental role in establishing data collection methodologies and market analysis protocols for the newly formed intelligence unit, improving reporting accuracy by Z%.`,
+      - Negotiated deals, both investment and development, and collaborated with the merge with BTG Pactual, the leading investment bank in Brazil. 
+      - Played an instrumental role in establishing data collection methodologies and market analysis protocols for the new intelligence department. This includes the creation (from scratch) of databases and analysis tools.`,
     },
     {
       id: 6,
@@ -104,8 +107,7 @@ const ScientistCareer = () => {
       icon: GraduationCap,
       moreDetails: `Relevant coursework and projects:
       - Key Modules: Structural Analysis, Electromagnetism, Control Systems, Signal Processing, Thermodynamics, Fluid Mechanics.
-      - Final Year Project: Focused on the design and simulation of a sustainable urban infrastructure element, achieving X in [metric].
-      - Consistently ranked in the top Y% of the cohort in [specific relevant area].`,
+      - Graduated in the top 10% (as per professors evaluations).`,
     },
     {
       id: 7,
@@ -117,8 +119,7 @@ const ScientistCareer = () => {
       icon: Anchor,
       moreDetails: `Project details and contributions:
       - Utilized computational fluid dynamics (CFD) software to simulate and optimize hydrofoil shapes for reduced drag and improved lift characteristics.
-      - Assisted in the setup and execution of experimental tests in a water tunnel facility, collecting and analyzing performance data.
-      - Contributed to a research paper/report on [specific finding or aspect of the project].`,
+      - Assisted in the setup and execution of experimental tests in a water tunnel facility, collecting and analyzing performance data.`,
     },
     {
       id: 8,
@@ -131,7 +132,7 @@ const ScientistCareer = () => {
       moreDetails: `Areas of study and engagement:
       - Focused on Group Theory, Ring Theory, and Galois Theory.
       - Actively participated in weekly advanced seminars and problem-solving sessions.
-      - Developed a deeper understanding of mathematical proofs, abstract structures, and their applications in other scientific fields.`,
+      - Developed a deeper understanding of mathematical proofs, abstract structures`,
     },
   ];
 

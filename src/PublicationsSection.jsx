@@ -53,7 +53,7 @@ const PublicationsSection = () => {
       year: "2021",
       doi: "10.1021/acs.jpclett.1c02271",
       link: "https://doi.org/10.1021/acs.jpclett.1c02271",
-      note: "A DFT study.",
+      note: "A DFT study. Cyclical single atom manipulations on GaAs(110). ",
     },
   ];
   return (
@@ -61,8 +61,7 @@ const PublicationsSection = () => {
       <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
         Contributing to the body of scientific knowledge through peer-reviewed
         research. These works explore topics from machine learning in microscopy
-        to fundamental studies of molecular interactions. Click "Explain with
-        AI" for a quick summary!
+        to fundamental studies of molecular interactions.
       </p>
       <div className="space-y-6">
         {publications.map((pub, index) => (

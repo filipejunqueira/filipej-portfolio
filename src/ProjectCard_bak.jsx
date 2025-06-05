@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 // Import specific icons from 'lucide-react'.
 import {
-  Image as ImageIcon,
+  Image as ImageIcon, // Renamed to avoid conflict with <img>.
   Palette,
   Code,
   ChevronUp,
@@ -26,7 +26,6 @@ import {
  * @param {string} props.type - Type of project (e.g., "blender", "code").
  * @param {boolean} props.isGalleryOpen - State if gallery is expanded.
  * @param {function} props.onToggleGallery - Callback to toggle gallery.
- * @param {function} props.onImageClick - Callback to open an image in the lightbox.
  */
 const ProjectCard = ({
   title,
@@ -39,7 +38,6 @@ const ProjectCard = ({
   type,
   isGalleryOpen,
   onToggleGallery,
-  onImageClick, // New prop to handle image clicks for the lightbox
 }) => {
   // State for expanding/collapsing the description text.
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -82,16 +80,13 @@ const ProjectCard = ({
   return (
     <article className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
       {type === "blender" && mainImage ? (
-        <div className="overflow-hidden rounded-md mb-5 shadow-sm">
-          <img
-            src={mainImage}
-            alt={`Main image for ${title} - ${type} project`}
-            className="w-full h-52 md:h-60 object-cover transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer" // Added hover/cursor classes
-            onError={imageErrorHandler}
-            loading="lazy"
-            onClick={() => onImageClick(mainImage)} // Added onClick for lightbox
-          />
-        </div>
+        <img
+          src={mainImage}
+          alt={`Main image for ${title} - ${type} project`}
+          className="w-full h-52 md:h-60 rounded-md object-cover mb-5 shadow-sm"
+          onError={imageErrorHandler}
+          loading="lazy"
+        />
       ) : (
         <div
           className={`w-full h-52 md:h-60 rounded-md flex items-center justify-center text-white dark:text-slate-300 text-xl font-semibold mb-5 ${imagePlaceholderColor || "bg-gray-300 dark:bg-slate-700"}`}
@@ -181,16 +176,13 @@ const ProjectCard = ({
             className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700"
           >
             <div className="relative mb-2">
-              <div className="overflow-hidden rounded-md">
-                <img
-                  src={galleryImages[currentImageIndex]}
-                  alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length}`}
-                  className="w-full h-60 md:h-72 object-cover shadow-inner bg-gray-100 dark:bg-slate-700 transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer" // Added hover/cursor classes
-                  onError={imageErrorHandler}
-                  loading="lazy"
-                  onClick={() => onImageClick(galleryImages[currentImageIndex])} // Added onClick for lightbox
-                />
-              </div>
+              <img
+                src={galleryImages[currentImageIndex]}
+                alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length}`}
+                className="w-full h-60 md:h-72 rounded-md object-cover shadow-inner bg-gray-100 dark:bg-slate-700"
+                onError={imageErrorHandler}
+                loading="lazy"
+              />
               {galleryImages.length > 1 && (
                 <>
                   <button

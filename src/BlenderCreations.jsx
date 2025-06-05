@@ -1,10 +1,11 @@
 // BlenderCreations.jsx
 // Import React, hooks, Section, AnimatedSection, ProjectCard, and Lucide icon.
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion"; // Added motion and AnimatePresence
 import Section from "./Section";
 import AnimatedSection from "./AnimatedSection";
-import ProjectCard from "./ProjectCard"; // Assuming ProjectCard.jsx is in the same directory
-import { Palette } from "lucide-react";
+import ProjectCard from "./ProjectCard";
+import { Palette, X } from "lucide-react"; // Added X icon for the close button
 
 // Import Blender Art Images for the gallery - Ensure paths are correct.
 import blenderA from "./assets/blenderA.png";
@@ -23,11 +24,14 @@ import blenderC2 from "./assets/blenderC2.png";
 import blenderC3 from "./assets/blenderC3.png";
 
 /**
- * BlenderCreations Component: Showcases Blender 3D art projects.
+ * BlenderCreations Component: Showcases Blender 3D art projects with a lightbox.
  */
 const BlenderCreations = () => {
   // State for expanded gallery.
   const [expandedGalleryId, setExpandedGalleryId] = useState(null);
+  // State for the lightbox image. null = closed, string (URL) = open
+  const [lightboxImage, setLightboxImage] = useState(null);
+
   // Blender project data.
   const blenderProjects = [
     {
@@ -67,34 +71,85 @@ const BlenderCreations = () => {
     setExpandedGalleryId((prevId) => (prevId === projectId ? null : projectId));
 
   return (
-    <Section title="Blender Art & 3D Visualization" icon={Palette} id="blender">
-      <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
-        Leveraging Blender for creative 3D projects, scientific visualization,
-        and concept art. Each piece is a journey into form, light, and
-        narrative, aiming to bridge the gap between the technical and the
-        aesthetic.
-      </p>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {blenderProjects.map((project, index) => (
-          <AnimatedSection
-            key={project.id}
-            delay={index * 0.15}
-            threshold={0.1}
+    <>
+      <Section
+        title="Blender Art & 3D Visualization"
+        icon={Palette}
+        id="blender"
+      >
+        <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+          Leveraging Blender for creative 3D projects, scientific visualization,
+          and concept art. Each piece is a journey into form, light, and
+          narrative, aiming to bridge the gap between the technical and the
+          aesthetic.
+        </p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+          {blenderProjects.map((project, index) => (
+            <AnimatedSection
+              key={project.id}
+              delay={index * 0.15}
+              threshold={0.1}
+            >
+              <ProjectCard
+                {...project}
+                type="blender"
+                isGalleryOpen={expandedGalleryId === project.id}
+                onToggleGallery={() => handleToggleGallery(project.id)}
+                onImageClick={setLightboxImage} // Pass the setter function to ProjectCard
+              />
+            </AnimatedSection>
+          ))}
+        </div>
+        <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-12 md:mt-16">
+          More creations and visualizations coming soon! Stay tuned for updates
+          on new projects and explorations.
+        </p>
+      </Section>
+
+      {/* Lightbox Modal Implementation */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxImage(null)} // Close lightbox when clicking the overlay
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            aria-modal="true"
+            role="dialog"
           >
-            <ProjectCard
-              {...project}
-              type="blender"
-              isGalleryOpen={expandedGalleryId === project.id}
-              onToggleGallery={() => handleToggleGallery(project.id)}
-            />
-          </AnimatedSection>
-        ))}
-      </div>
-      <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-12 md:mt-16">
-        More creations and visualizations coming soon! Stay tuned for updates on
-        new projects and explorations.
-      </p>
-    </Section>
+            {/* Close Button */}
+            <motion.button
+              initial={{ scale: 0, rotate: -90 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: -90 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-5 right-5 text-white bg-black/40 rounded-full p-2 hover:bg-black/60 transition-colors"
+              aria-label="Close image view"
+            >
+              <X size={30} />
+            </motion.button>
+
+            {/* Enlarged Image */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 250, damping: 25 }}
+              onClick={(e) => e.stopPropagation()} // Prevents closing lightbox when clicking the image itself
+              className="relative max-w-[90vw] max-h-[90vh]"
+            >
+              <img
+                src={lightboxImage}
+                alt="Enlarged view of Blender render"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

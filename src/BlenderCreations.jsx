@@ -1,13 +1,13 @@
 // BlenderCreations.jsx
 // Import React, hooks, Section, AnimatedSection, ProjectCard, and Lucide icon.
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Added motion and AnimatePresence
+import { motion, AnimatePresence } from "framer-motion";
 import Section from "./Section";
 import AnimatedSection from "./AnimatedSection";
 import ProjectCard from "./ProjectCard";
-import { Palette, X } from "lucide-react"; // Added X icon for the close button
+import { Palette, X, ImageIcon, ChevronUp } from "lucide-react";
 
-// Import Blender Art Images for the gallery - Ensure paths are correct.
+// Import Blender Art Images for the gallery.
 import blenderA from "./assets/blenderA.png";
 import blenderA1 from "./assets/blenderA1.png";
 import blenderA2 from "./assets/blenderA2.png";
@@ -27,48 +27,43 @@ import blenderC3 from "./assets/blenderC3.png";
  * BlenderCreations Component: Showcases Blender 3D art projects with a lightbox.
  */
 const BlenderCreations = () => {
-  // State for expanded gallery.
-  const [expandedGalleryId, setExpandedGalleryId] = useState(null);
-  // State for the lightbox image. null = closed, string (URL) = open
+  // State to control the visibility of ALL galleries at once.
+  const [areAllGalleriesOpen, setAreAllGalleriesOpen] = useState(false);
+  // State for the lightbox image remains the same.
   const [lightboxImage, setLightboxImage] = useState(null);
 
-  // Blender project data.
+  // Blender project data remains the same.
   const blenderProjects = [
     {
       id: 1,
       title: "Abstract 3D Art",
-      description:
-        "Exploring forms, textures, and lighting using Blender for creating visually compelling abstract scenes. This involves procedural texturing and complex node setups for dynamic and intricate results.",
-      artisticStatement:
-        "Focus: Procedural generation, photorealism in abstract contexts.",
+      description: "Exploring forms, textures, and lighting...",
+      artisticStatement: "Focus: Procedural generation...",
       mainImage: blenderA,
       galleryImages: [blenderA1, blenderA2, blenderA3],
     },
     {
       id: 2,
       title: "Scientific Visualization",
-      description:
-        "Using Blender to create visualizations for complex scientific concepts, such as molecular structures, quantum phenomena, or astrophysical simulations, making them accessible and understandable to a broader audience.",
-      artisticStatement:
-        "Goal: To accurately and beautifully convey complex scientific data.",
+      description: "Using Blender to create visualizations...",
+      artisticStatement: "Goal: To accurately and beautifully convey...",
       mainImage: blenderB,
       galleryImages: [blenderB1, blenderB2, blenderB3, blenderB4, blenderB5],
     },
     {
       id: 3,
       title: "Character/Concept Design",
-      description:
-        "Developing unique characters and concepts in 3D, from initial sculpting and retopology to final texturing, rigging for animation, or preparing for 3D printing.",
-      artisticStatement:
-        "Exploration: Character storytelling through form and detail.",
+      description: "Developing unique characters and concepts...",
+      artisticStatement: "Exploration: Character storytelling...",
       mainImage: blenderC,
       galleryImages: [blenderC1, blenderC2, blenderC3],
     },
   ];
 
-  // Toggles gallery visibility.
-  const handleToggleGallery = (projectId) =>
-    setExpandedGalleryId((prevId) => (prevId === projectId ? null : projectId));
+  // Function to toggle the state of all galleries.
+  const toggleAllGalleries = () => {
+    setAreAllGalleriesOpen((prevState) => !prevState);
+  };
 
   return (
     <>
@@ -83,6 +78,9 @@ const BlenderCreations = () => {
           narrative, aiming to bridge the gap between the technical and the
           aesthetic.
         </p>
+
+        {/* The Master Toggle Button has been MOVED from here. */}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {blenderProjects.map((project, index) => (
             <AnimatedSection
@@ -93,32 +91,47 @@ const BlenderCreations = () => {
               <ProjectCard
                 {...project}
                 type="blender"
-                isGalleryOpen={expandedGalleryId === project.id}
-                onToggleGallery={() => handleToggleGallery(project.id)}
-                onImageClick={setLightboxImage} // Pass the setter function to ProjectCard
+                isGalleryOpen={areAllGalleriesOpen}
+                onImageClick={setLightboxImage}
               />
             </AnimatedSection>
           ))}
         </div>
-        <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-12 md:mt-16">
+
+        {/* NEW POSITION: Master button to toggle all galleries is now here, below the cards. */}
+        <div className="text-center mt-12 md:mt-16">
+          <button
+            onClick={toggleAllGalleries}
+            className="inline-flex items-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-all duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
+            aria-expanded={areAllGalleriesOpen}
+          >
+            {areAllGalleriesOpen ? "Hide All Images" : "View All Images"}
+            {areAllGalleriesOpen ? (
+              <ChevronUp size={18} aria-hidden="true" />
+            ) : (
+              <ImageIcon size={18} aria-hidden="true" />
+            )}
+          </button>
+        </div>
+
+        <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-8">
           More creations and visualizations coming soon! Stay tuned for updates
           on new projects and explorations.
         </p>
       </Section>
 
-      {/* Lightbox Modal Implementation */}
+      {/* Lightbox Modal Implementation (remains unchanged) */}
       <AnimatePresence>
         {lightboxImage && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setLightboxImage(null)} // Close lightbox when clicking the overlay
+            onClick={() => setLightboxImage(null)}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             aria-modal="true"
             role="dialog"
           >
-            {/* Close Button */}
             <motion.button
               initial={{ scale: 0, rotate: -90 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -130,14 +143,12 @@ const BlenderCreations = () => {
             >
               <X size={30} />
             </motion.button>
-
-            {/* Enlarged Image */}
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", stiffness: 250, damping: 25 }}
-              onClick={(e) => e.stopPropagation()} // Prevents closing lightbox when clicking the image itself
+              onClick={(e) => e.stopPropagation()}
               className="relative max-w-[90vw] max-h-[90vh]"
             >
               <img

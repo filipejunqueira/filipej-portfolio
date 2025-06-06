@@ -25,7 +25,6 @@ import {
  * @param {string} [props.link] - Optional external link.
  * @param {string} props.type - Type of project (e.g., "blender", "code").
  * @param {boolean} props.isGalleryOpen - State if gallery is expanded.
- * @param {function} props.onToggleGallery - Callback to toggle gallery.
  * @param {function} props.onImageClick - Callback to open an image in the lightbox.
  */
 const ProjectCard = ({
@@ -37,9 +36,8 @@ const ProjectCard = ({
   imagePlaceholderColor,
   link,
   type,
-  isGalleryOpen,
-  onToggleGallery,
-  onImageClick, // New prop to handle image clicks for the lightbox
+  isGalleryOpen, // This prop remains, but is now controlled globally
+  onImageClick,
 }) => {
   // State for expanding/collapsing the description text.
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -86,10 +84,10 @@ const ProjectCard = ({
           <img
             src={mainImage}
             alt={`Main image for ${title} - ${type} project`}
-            className="w-full h-52 md:h-60 object-cover transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer" // Added hover/cursor classes
+            className="w-full h-52 md:h-60 object-cover transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
             onError={imageErrorHandler}
             loading="lazy"
-            onClick={() => onImageClick(mainImage)} // Added onClick for lightbox
+            onClick={() => onImageClick(mainImage)}
           />
         </div>
       ) : (
@@ -142,24 +140,7 @@ const ProjectCard = ({
       )}
 
       <div className="mt-auto">
-        {type === "blender" &&
-          galleryImages &&
-          galleryImages.length > 0 &&
-          onToggleGallery && (
-            <button
-              onClick={onToggleGallery}
-              className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start mr-4 text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
-              aria-expanded={isGalleryOpen}
-              aria-controls={`${title.replace(/\s+/g, "-").toLowerCase()}-gallery`}
-            >
-              {isGalleryOpen ? "Hide Images" : "View Images"}
-              {isGalleryOpen ? (
-                <ChevronUp size={18} className="ml-2" aria-hidden="true" />
-              ) : (
-                <ImageIcon size={18} className="ml-2" aria-hidden="true" />
-              )}
-            </button>
-          )}
+        {/* The "View/Hide Images" button has been REMOVED from here */}
         {link && (
           <a
             href={link}
@@ -172,6 +153,7 @@ const ProjectCard = ({
         )}
       </div>
 
+      {/* This gallery display logic now depends on the globally controlled isGalleryOpen prop */}
       {type === "blender" &&
         isGalleryOpen &&
         galleryImages &&
@@ -185,10 +167,10 @@ const ProjectCard = ({
                 <img
                   src={galleryImages[currentImageIndex]}
                   alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length}`}
-                  className="w-full h-60 md:h-72 object-cover shadow-inner bg-gray-100 dark:bg-slate-700 transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer" // Added hover/cursor classes
+                  className="w-full h-60 md:h-72 object-cover shadow-inner bg-gray-100 dark:bg-slate-700 transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
                   onError={imageErrorHandler}
                   loading="lazy"
-                  onClick={() => onImageClick(galleryImages[currentImageIndex])} // Added onClick for lightbox
+                  onClick={() => onImageClick(galleryImages[currentImageIndex])}
                 />
               </div>
               {galleryImages.length > 1 && (

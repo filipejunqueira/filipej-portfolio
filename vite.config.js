@@ -24,9 +24,8 @@ export default defineConfig({
           // Forms chunk
           forms: ['@formspree/react'],
           // Icons chunk
-          icons: ['lucide-react'],
-          // Firebase chunk (if used)
-          firebase: ['firebase']
+          icons: ['lucide-react']
+          // Firebase chunk removed - using optimized version without Firebase
         }
       }
     },
@@ -49,9 +48,8 @@ export default defineConfig({
       'react-helmet-async',
       '@formspree/react',
       'lucide-react'
-    ],
-    // Exclude Firebase from pre-bundling to allow for optional loading
-    exclude: ['firebase']
+    ]
+    // Firebase excluded - using optimized version without Firebase dependency
   },
   
   // Enable esbuild minification for better performance

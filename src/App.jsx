@@ -1,6 +1,6 @@
 // App.jsx
 // Import React and necessary hooks.
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 // Import Helmet for managing document head.
 import { Helmet } from "react-helmet-async";
 

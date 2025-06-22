@@ -23,6 +23,8 @@ const defaultVariants = {
  * @param {object} [props.variants=defaultVariants] - Framer Motion animation variants.
  * @param {number} [props.delay=0] - Animation delay in seconds.
  * @param {number} [props.threshold=0.1] - Percentage of the element that needs to be in view to trigger the animation.
+ * @param {boolean} [props.reduceMotion=false] - Whether to respect prefers-reduced-motion
+ * @param {string} [props.ariaLabel] - ARIA label for accessibility
  */
 const AnimatedSection = ({
   children,
@@ -31,6 +33,8 @@ const AnimatedSection = ({
   variants = defaultVariants,
   delay = 0,
   threshold = 0.1,
+  reduceMotion = false,
+  ariaLabel,
 }) => {
   // `useAnimation` hook from Framer Motion to programmatically control animations.
   const controls = useAnimation();
@@ -39,12 +43,21 @@ const AnimatedSection = ({
   // `threshold` determines how much of the element must be visible to trigger.
   const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // `useEffect` hook to start the animation when the component comes into view.
   useEffect(() => {
     if (inView) {
-      controls.start("visible"); // Start the 'visible' animation variant.
+      if (prefersReducedMotion || reduceMotion) {
+        // Skip animation, just show content
+        controls.start({ opacity: 1, x: 0, y: 0 });
+      } else {
+        controls.start("visible"); // Start the 'visible' animation variant.
+      }
     }
-  }, [controls, inView]); // Dependencies: re-run effect if 'controls' or 'inView' changes.
+  }, [controls, inView, prefersReducedMotion, reduceMotion]); // Dependencies: re-run effect if 'controls' or 'inView' changes.
 
   return (
     // `motion.div` is a Framer Motion component that enables animations on a div.
@@ -52,10 +65,15 @@ const AnimatedSection = ({
       ref={ref} // Assign the ref from `useInView` to this element.
       id={id} // HTML id attribute.
       className={className} // CSS classes.
-      initial="hidden" // Initial animation state.
+      initial={prefersReducedMotion || reduceMotion ? { opacity: 1, x: 0, y: 0 } : "hidden"} // Initial animation state.
       animate={controls} // Link animation controls.
       variants={variants} // Animation variants to use.
-      transition={{ duration: 0.6, delay }} // Animation transition properties.
+      transition={{ 
+        duration: prefersReducedMotion || reduceMotion ? 0 : 0.6, 
+        delay: prefersReducedMotion || reduceMotion ? 0 : delay 
+      }} // Animation transition properties.
+      aria-label={ariaLabel}
+      role={ariaLabel ? "region" : undefined}
     >
       {children}
     </motion.div>

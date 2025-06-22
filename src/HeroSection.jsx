@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 // Import assets.
 import profilePic from "./assets/captainbroccoli.png"; // Ensure this path is correct
 import filipeCv from "./assets/filipecv.pdf"; // Ensure this path is correct
+// Import OptimizedImage component
+import OptimizedImage from "./OptimizedImage";
 
 /**
  * HeroSection Component: The main landing/introduction section.
@@ -16,10 +18,7 @@ const HeroSection = () => (
     aria-labelledby="main-heading"
   >
     <div className="container mx-auto text-center px-6 flex flex-col items-center">
-      <motion.img
-        src={profilePic}
-        alt="Filipe L. Q. Junqueira - Main Profile Picture"
-        className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover mb-8 shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
+      <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{
@@ -28,8 +27,16 @@ const HeroSection = () => (
           type: "spring",
           stiffness: 120,
         }}
-        loading="eager"
-      />
+        className="mb-8"
+      >
+        <OptimizedImage
+          src={profilePic}
+          alt="Filipe L. Q. Junqueira - Main Profile Picture"
+          className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
+          priority={true}
+          sizes="(max-width: 768px) 144px, 176px"
+        />
+      </motion.div>
       <motion.h1
         id="main-heading"
         className="text-4xl sm:text-5xl md:text-6xl font-light mb-6 dark:text-slate-100"

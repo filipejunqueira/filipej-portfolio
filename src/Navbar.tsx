@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { Sun, Moon } from "lucide-react";
 // Import assets.
 import profilePic from "./assets/captainbroccoli.png"; // Ensure this path is correct
+// Import OptimizedImage component
+import OptimizedImage from "./OptimizedImage";
 
 /**
  * Navbar Component: Site navigation bar.
@@ -52,14 +54,19 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <motion.img
-              src={profilePic}
-              alt="Filipe L. Q. Junqueira - Profile Picture"
-              className="w-10 h-10 rounded-full mr-3 object-cover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
+            <motion.div
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
-              loading="lazy"
-            />
+              className="mr-3"
+            >
+              <OptimizedImage
+                src={profilePic}
+                alt="Filipe L. Q. Junqueira - Profile Picture"
+                className="w-10 h-10 rounded-full object-cover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
+                priority={true}
+                sizes="40px"
+              />
+            </motion.div>
             <motion.a
               href="#home"
               onClick={() => setActiveSection("home")}

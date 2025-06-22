@@ -12,6 +12,8 @@ import {
   ArrowRightCircle,
   ExternalLink,
 } from "lucide-react";
+// Import OptimizedImage component
+import OptimizedImage from "./OptimizedImage";
 
 /**
  * ProjectCard Component: Displays details for a single project.
@@ -81,13 +83,13 @@ const ProjectCard = ({
     <article className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
       {type === "blender" && mainImage ? (
         <div className="overflow-hidden rounded-md mb-5 shadow-sm">
-          <img
+          <OptimizedImage
             src={mainImage}
             alt={`Main image for ${title} - ${type} project`}
             className="w-full h-52 md:h-60 object-cover transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
             onError={imageErrorHandler}
-            loading="lazy"
             onClick={() => onImageClick(mainImage)}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
       ) : (
@@ -164,13 +166,13 @@ const ProjectCard = ({
           >
             <div className="relative mb-2">
               <div className="overflow-hidden rounded-md">
-                <img
+                <OptimizedImage
                   src={galleryImages[currentImageIndex]}
                   alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length}`}
                   className="w-full h-60 md:h-72 object-cover shadow-inner bg-gray-100 dark:bg-slate-700 transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
                   onError={imageErrorHandler}
-                  loading="lazy"
                   onClick={() => onImageClick(galleryImages[currentImageIndex])}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               {galleryImages.length > 1 && (

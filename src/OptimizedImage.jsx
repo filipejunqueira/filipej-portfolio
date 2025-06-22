@@ -4,7 +4,8 @@ import React, { useState } from "react";
 /**
  * OptimizedImage Component: Handles responsive images with WebP fallback
  * @param {object} props - Component props
- * @param {string} props.src - Image source URL
+ * @param {string} props.src - Image source URL (fallback format)
+ * @param {string} [props.webpSrc] - WebP source URL (if available)
  * @param {string} props.alt - Alt text for accessibility
  * @param {string} [props.className] - CSS classes
  * @param {string} [props.loading="lazy"] - Loading strategy
@@ -15,6 +16,7 @@ import React, { useState } from "react";
  */
 const OptimizedImage = ({
   src,
+  webpSrc,
   alt,
   className = "",
   loading = "lazy",
@@ -27,8 +29,10 @@ const OptimizedImage = ({
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Extract file extension and create WebP version
+  // Use provided WebP source or auto-generate from original src
   const getWebPSrc = (originalSrc) => {
+    if (webpSrc) return webpSrc;
+    
     const lastDotIndex = originalSrc.lastIndexOf('.');
     if (lastDotIndex !== -1) {
       return originalSrc.substring(0, lastDotIndex) + '.webp';

@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 // Import assets.
 import profilePic from "./assets/captainbroccoli.png"; // Ensure this path is correct
+import profilePicWebP from "./assets/captainbroccoli.webp"; // WebP version for optimization
 import filipeCv from "./assets/filipecv.pdf"; // Ensure this path is correct
 // Import OptimizedImage component
 import OptimizedImage from "./OptimizedImage";
@@ -31,6 +32,7 @@ const HeroSection = () => (
       >
         <OptimizedImage
           src={profilePic}
+          webpSrc={profilePicWebP}
           alt="Filipe L. Q. Junqueira - Main Profile Picture"
           className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
           priority={true}

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon } from "lucide-react";
 // Import assets.
 import profilePic from "./assets/captainbroccoli.png"; // Ensure this path is correct
+import profilePicWebP from "./assets/captainbroccoli.webp"; // WebP version for optimization
 // Import OptimizedImage component
 import OptimizedImage from "./OptimizedImage";
 
@@ -61,6 +62,7 @@ const Navbar = ({ setActiveSection, toggleDarkMode, isDarkMode }) => {
             >
               <OptimizedImage
                 src={profilePic}
+                webpSrc={profilePicWebP}
                 alt="Filipe L. Q. Junqueira - Profile Picture"
                 className="w-10 h-10 rounded-full object-cover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-300 dark:focus:ring-emerald-500 focus:ring-offset-emerald-600 dark:focus:ring-offset-slate-800"
                 priority={true}

@@ -14,6 +14,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+// Import UI components
+import { Article, Button, Container, TextPrimary, TextSecondary, TextMuted } from "./components/UI";
 
 /**
  * ScientistCareer Component: Details career and education.
@@ -144,11 +146,14 @@ const ScientistCareer = () => {
 
   return (
     <Section title="Career & Education" icon={Briefcase} id="scientist">
-      <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <TextSecondary 
+        as="p" 
+        className="text-center text-base md:text-lg mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed"
+      >
         A journey through academia and industry, driven by a passion for
         physics, data, and problem-solving. Each step has been a building block
         towards new discoveries and innovations.
-      </p>
+      </TextSecondary>
       <div className="space-y-8">
         {careerMilestones.map((milestone, index) => {
           const MilestoneIcon = milestone.icon;
@@ -159,8 +164,8 @@ const ScientistCareer = () => {
               delay={index * 0.1}
               threshold={0.05}
             >
-              <article
-                className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-lg dark:shadow-slate-700/60 dark:border dark:border-slate-700"
+              <Article
+                className="shadow-lg"
                 aria-labelledby={`career-title-${milestone.id}`}
               >
                 <div className="flex flex-col sm:flex-row items-start">
@@ -173,25 +178,28 @@ const ScientistCareer = () => {
                     )}
                   </div>
                   <div className="flex-grow">
-                    <h3
+                    <TextPrimary
+                      as="h3"
                       id={`career-title-${milestone.id}`}
                       className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300"
                     >
                       {milestone.role}
-                    </h3>
-                    <p className="text-base text-emerald-700 dark:text-emerald-400 font-normal mt-1">
+                    </TextPrimary>
+                    <TextPrimary className="text-base text-emerald-700 dark:text-emerald-400 font-normal mt-1">
                       {milestone.institution}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-2 mt-0.5">
+                    </TextPrimary>
+                    <TextMuted className="text-sm mb-2 mt-0.5">
                       {milestone.duration}
-                    </p>
-                    <p className="text-gray-700 dark:text-slate-300 leading-relaxed text-base">
+                    </TextMuted>
+                    <TextSecondary className="leading-relaxed text-base">
                       {milestone.description}
-                    </p>
+                    </TextSecondary>
                     {milestone.moreDetails && (
-                      <button
+                      <Button
                         onClick={() => handleToggleDetail(milestone.id)}
-                        className="mt-4 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium inline-flex items-center uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+                        variant="ghost"
+                        size="sm"
+                        className="mt-4 uppercase tracking-wider"
                         aria-expanded={isExpanded}
                         aria-controls={`career-details-${milestone.id}`}
                       >
@@ -209,7 +217,7 @@ const ScientistCareer = () => {
                             aria-hidden="true"
                           />
                         )}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -222,12 +230,12 @@ const ScientistCareer = () => {
                     transition={{ duration: 0.3 }}
                     className="mt-4 pt-4 border-t border-emerald-200 dark:border-slate-700"
                   >
-                    <p className="text-gray-700 dark:text-slate-300 leading-relaxed text-sm whitespace-pre-line">
+                    <TextSecondary className="leading-relaxed text-sm whitespace-pre-line">
                       {milestone.moreDetails}
-                    </p>
+                    </TextSecondary>
                   </motion.div>
                 )}
-              </article>
+              </Article>
             </AnimatedSection>
           );
         })}

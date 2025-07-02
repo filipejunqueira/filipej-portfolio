@@ -8,7 +8,13 @@ export default {
   // This tells Tailwind to apply dark mode styles when a 'dark' class
   // is present on the <html> element (which we'll manage with JavaScript).
   darkMode: "class",
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html", 
+    "./src/**/*.{js,ts,jsx,tsx}",
+    // Safelist ensures UI components always work
+    { pattern: /^(bg|text|border)-(slate|emerald|gray|sky)-(50|100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /^(focus|hover):(ring|bg|border|text)-(emerald|slate)-(300|400|500|600)/ },
+  ],
   theme: {
     extend: {
       // Your existing custom spacing
@@ -22,13 +28,22 @@ export default {
         // sans-serif fonts as fallbacks, which is good practice.
         sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
       },
-      // Optional: You can define some dark mode specific color palettes here if you want
-      // to create reusable color names for your dark theme. For example:
-      // colors: {
-      //   'brand-dark-bg': '#1a202c', // A very dark gray/blue
-      //   'brand-dark-card': '#2d3748', // A slightly lighter dark gray/blue for cards
-      //   'brand-dark-text': '#e2e8f0', // A light gray for text in dark mode
-      // }
+      // Add CSS custom properties for theme switching optimization
+      colors: {
+        primary: {
+          50: 'rgb(var(--color-primary-50) / <alpha-value>)',
+          100: 'rgb(var(--color-primary-100) / <alpha-value>)',
+          500: 'rgb(var(--color-primary-500) / <alpha-value>)',
+          600: 'rgb(var(--color-primary-600) / <alpha-value>)',
+          700: 'rgb(var(--color-primary-700) / <alpha-value>)',
+        },
+        surface: {
+          50: 'rgb(var(--color-surface-50) / <alpha-value>)',
+          100: 'rgb(var(--color-surface-100) / <alpha-value>)',
+          800: 'rgb(var(--color-surface-800) / <alpha-value>)',
+          900: 'rgb(var(--color-surface-900) / <alpha-value>)',
+        },
+      },
     },
   },
   plugins: [],

@@ -1,10 +1,13 @@
 // ContactSection.jsx
-// Import React, hooks, motion, Section, AnimatedSection, HoverFlipButton, and Lucide icons.
+// Import React, hooks, motion, Section, AnimatedSection, HoverFlipButton, UI components, and Lucide icons.
 import React from "react"; // Removed useState as Formspree handles state
 import { motion } from "framer-motion";
 import Section from "./Section";
 import AnimatedSection from "./AnimatedSection";
 import HoverFlipButton from "./HoverFlipButton";
+import { Card, Button, Input, Textarea, TextSecondary } from "./components/UI";
+// Import centralized animations
+import { defaultVariants } from "./animations";
 import {
   Users,
   Linkedin,
@@ -56,18 +59,23 @@ const ContactSection = () => {
 
   return (
     <Section title="Get In Touch" icon={Users} id="contact">
-      <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed">
+      <TextSecondary 
+        as="p" 
+        className="text-center text-base md:text-lg mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed"
+      >
         I'm always open to discussing new projects, collaborations, or just
         connecting with like-minded individuals. Send me a message using the
         form below, or connect via social media!
-      </p>
+      </TextSecondary>
 
       <motion.div
-        className="max-w-xl mx-auto bg-white dark:bg-slate-800/50 p-6 sm:p-8 rounded-lg shadow-lg dark:shadow-slate-700/70 mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        className="max-w-xl mx-auto mb-12"
+        initial="hidden"
+        animate="visible"
+        variants={defaultVariants}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
+        <Card className="p-6 sm:p-8">
         {/* Display thank you message on successful submission */}
         {state.succeeded ? (
           <p className="text-center text-lg font-medium text-green-600 dark:text-green-400 py-10">
@@ -83,12 +91,11 @@ const ContactSection = () => {
               >
                 Full Name
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 name="name" // Formspree uses this name attribute
                 required
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
                 placeholder="Your Name"
               />
               <ValidationError
@@ -105,12 +112,11 @@ const ContactSection = () => {
               >
                 Email Address
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 name="email" // Formspree uses this name attribute
                 required
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
                 placeholder="you@example.com"
               />
               <ValidationError
@@ -127,14 +133,13 @@ const ContactSection = () => {
               >
                 Message
               </label>
-              <textarea
+              <Textarea
                 id="message"
                 name="message" // Formspree uses this name attribute
                 rows="4"
                 required
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 dark:bg-slate-700 dark:text-slate-100 sm:text-sm transition-colors"
                 placeholder="Your message..."
-              ></textarea>
+              />
               <ValidationError
                 prefix="Message"
                 field="message"
@@ -143,23 +148,24 @@ const ContactSection = () => {
               />
             </div>
             <div>
-              <button
+              <Button
                 type="submit"
                 disabled={state.submitting} // Disable button while submitting
-                className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                variant="primary"
+                className="w-full gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {state.submitting ? (
                   <>
-                    <Loader2 size={20} className="animate-spin mr-2" />
+                    <Loader2 size={20} className="animate-spin" />
                     Sending...
                   </>
                 ) : (
                   <>
-                    <Send size={18} className="mr-2" />
+                    <Send size={18} />
                     Send Message
                   </>
                 )}
-              </button>
+              </Button>
               {/* Display general submission errors not tied to a specific field */}
               {state.errors &&
                 !state.errors.getAllerrors &&
@@ -172,12 +178,13 @@ const ContactSection = () => {
             </div>
           </form>
         )}
+        </Card>
       </motion.div>
 
       {/* Social Contact Buttons Grid (remains the same) */}
-      <p className="text-center text-base text-gray-700 dark:text-slate-300 mb-6 md:mb-8">
+      <TextSecondary as="p" className="text-center text-base mb-6 md:mb-8">
         Or connect with me on social media:
-      </p>
+      </TextSecondary>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
         {socialContactButtons.map((button, index) => (
           <AnimatedSection key={index} delay={index * 0.1} threshold={0.1}>

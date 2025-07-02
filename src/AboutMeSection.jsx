@@ -4,6 +4,10 @@ import React from "react";
 import { motion } from "framer-motion";
 import { User } from "lucide-react"; // Icon for this section
 import Section from "./Section"; // Assuming Section.jsx is in the same directory
+// Import centralized animations
+import { defaultVariants } from "./animations";
+// Import UI components
+import { Container, TextSecondary } from "./components/UI";
 
 /**
  * AboutMeSection Component: Contains biographical information.
@@ -23,19 +27,21 @@ const AboutMeSection = () => {
       id="about"
       titleClassName="text-3xl sm:text-4xl md:text-5xl"
     >
-      <div className="max-w-3xl mx-auto space-y-5">
+      <Container size="sm" className="space-y-5">
         {aboutMeNarrative.map((paragraph, index) => (
-          <motion.p
+          <TextSecondary
+            as={motion.p}
             key={index}
-            className="text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed text-center md:text-left"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="text-base md:text-lg leading-relaxed text-center md:text-left"
+            initial="hidden"
+            animate="visible"
+            variants={defaultVariants}
             transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
           >
             {paragraph}
-          </motion.p>
+          </TextSecondary>
         ))}
-      </div>
+      </Container>
     </Section>
   );
 };

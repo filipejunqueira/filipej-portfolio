@@ -7,21 +7,9 @@ import AnimatedSection from "./AnimatedSection";
 import ProjectCard from "./ProjectCard";
 import { Palette, X, ImageIcon, ChevronUp } from "lucide-react";
 
-// Import Blender Art Images for the gallery.
-import blenderA from "./assets/blenderA.png";
-import blenderA1 from "./assets/blenderA1.png";
-import blenderA2 from "./assets/blenderA2.png";
-import blenderA3 from "./assets/blenderA3.png";
-import blenderB from "./assets/blenderB.png";
-import blenderB1 from "./assets/blenderB1.png";
-import blenderB2 from "./assets/blenderB2.png";
-import blenderB3 from "./assets/blenderB3.png";
-import blenderB4 from "./assets/blenderB4.png";
-import blenderB5 from "./assets/blenderB5.png";
-import blenderC from "./assets/blenderC.png";
-import blenderC1 from "./assets/blenderC1.png";
-import blenderC2 from "./assets/blenderC2.png";
-import blenderC3 from "./assets/blenderC3.png";
+
+// Import LazyImage component
+import LazyImage from "./LazyImage";
 
 /**
  * BlenderCreations Component: Showcases Blender 3D art projects with a lightbox.
@@ -31,32 +19,31 @@ const BlenderCreations = () => {
   const [areAllGalleriesOpen, setAreAllGalleriesOpen] = useState(false);
   // State for the lightbox image remains the same.
   const [lightboxImage, setLightboxImage] = useState(null);
-
-  // Blender project data remains the same.
+  // Blender project data with image names for dynamic loading.
   const blenderProjects = [
     {
       id: 1,
       title: "Abstract 3D Art",
       description: "Exploring forms, textures, and lighting...",
       artisticStatement: "Focus: Procedural generation...",
-      mainImage: blenderA,
-      galleryImages: [blenderA1, blenderA2, blenderA3],
+      mainImage: "blenderA",
+      galleryImages: ["blenderA1", "blenderA2", "blenderA3"],
     },
     {
       id: 2,
       title: "Scientific Visualization",
       description: "Using Blender to create visualizations...",
       artisticStatement: "Goal: To accurately and beautifully convey...",
-      mainImage: blenderB,
-      galleryImages: [blenderB1, blenderB2, blenderB3, blenderB4, blenderB5],
+      mainImage: "blenderB",
+      galleryImages: ["blenderB1", "blenderB2", "blenderB3", "blenderB4", "blenderB5"],
     },
     {
       id: 3,
       title: "Character/Concept Design",
       description: "Developing unique characters and concepts...",
       artisticStatement: "Exploration: Character storytelling...",
-      mainImage: blenderC,
-      galleryImages: [blenderC1, blenderC2, blenderC3],
+      mainImage: "blenderC",
+      galleryImages: ["blenderC1", "blenderC2", "blenderC3"],
     },
   ];
 

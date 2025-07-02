@@ -11,21 +11,37 @@ export default defineConfig({
     // Enable rollup optimizations
     rollupOptions: {
       output: {
-        // Manual chunk splitting for better caching
-        manualChunks: {
-          // Vendor chunk for external libraries
-          vendor: [
-            'react', 
-            'react-dom', 
-            'react-helmet-async'
-          ],
-          // Motion chunk for animations
-          motion: ['framer-motion'],
-          // Forms chunk
-          forms: ['@formspree/react'],
-          // Icons chunk
-          icons: ['lucide-react']
-          // Firebase chunk removed - using optimized version without Firebase
+        // Manual chunk splitting for better caching and performance
+        manualChunks: (id) => {
+          // React core dependencies
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react';
+          }
+          
+          // Animation libraries
+          if (id.includes('framer-motion')) {
+            return 'animations';
+          }
+          
+          // Utility libraries
+          if (id.includes('lucide-react')) {
+            return 'icons';
+          }
+          
+          // Form libraries
+          if (id.includes('@formspree/react')) {
+            return 'forms';
+          }
+          
+          // SEO and meta libraries
+          if (id.includes('react-helmet-async') || id.includes('react-intersection-observer')) {
+            return 'utils';
+          }
+          
+          // Node modules as vendor chunk (fallback)
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
       }
     },
@@ -36,7 +52,11 @@ export default defineConfig({
     // Minimize CSS
     cssMinify: true,
     // Set chunk size warning limit
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 500,
+    // Reduce bundle size
+    minify: 'esbuild',
+    // Enable CSS code splitting
+    cssCodeSplit: true
   },
   
   // Development optimizations
@@ -47,9 +67,11 @@ export default defineConfig({
       'framer-motion',
       'react-helmet-async',
       '@formspree/react',
-      'lucide-react'
-    ]
-    // Firebase excluded - using optimized version without Firebase dependency
+      'lucide-react',
+      'react-intersection-observer'
+    ],
+    // Exclude large or problematic dependencies
+    exclude: []
   },
   
   // Enable esbuild minification for better performance

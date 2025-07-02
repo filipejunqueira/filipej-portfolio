@@ -1,20 +1,7 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://filipej.dev/sitemap.xml
-
-# Popular crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-# Block AI training crawlers (optional)
+# Block AI crawlers
 User-agent: GPTBot
 Disallow: /
 
@@ -26,3 +13,11 @@ Disallow: /
 
 User-agent: anthropic-ai
 Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+Sitemap: https://filipej.dev/sitemap.xml

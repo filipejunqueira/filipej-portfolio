@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Custom Properties for Theme Optimization */
+@layer base {
+  :root {
+    /* Light theme colors */
+    --color-primary-50: 236 253 245; /* emerald-50 */
+    --color-primary-100: 209 250 229; /* emerald-100 */
+    --color-primary-500: 16 185 129; /* emerald-500 */
+    --color-primary-600: 5 150 105; /* emerald-600 */
+    --color-primary-700: 4 120 87; /* emerald-700 */
+    
+    --color-surface-50: 248 250 252; /* slate-50 */
+    --color-surface-100: 241 245 249; /* slate-100 */
+    --color-surface-800: 30 41 59; /* slate-800 */
+    --color-surface-900: 15 23 42; /* slate-900 */
+    
+    /* Text colors */
+    --color-text-primary: 30 41 59; /* slate-800 */
+    --color-text-secondary: 71 85 105; /* slate-600 */
+    --color-text-muted: 100 116 139; /* slate-500 */
+  }
+  
+  .dark {
+    /* Dark theme colors */
+    --color-primary-50: 4 120 87; /* emerald-700 in dark */
+    --color-primary-100: 5 150 105; /* emerald-600 in dark */
+    --color-primary-500: 52 211 153; /* emerald-400 */
+    --color-primary-600: 16 185 129; /* emerald-500 */
+    --color-primary-700: 110 231 183; /* emerald-300 */
+    
+    --color-surface-50: 15 23 42; /* slate-900 */
+    --color-surface-100: 30 41 59; /* slate-800 */
+    --color-surface-800: 51 65 85; /* slate-700 */
+    --color-surface-900: 71 85 105; /* slate-600 */
+    
+    /* Text colors for dark mode */
+    --color-text-primary: 226 232 240; /* slate-200 */
+    --color-text-secondary: 203 213 225; /* slate-300 */
+    --color-text-muted: 148 163 184; /* slate-400 */
+  }
+}
+
 /* Accessibility Utilities */
 @layer utilities {
   /* Screen reader only utility */

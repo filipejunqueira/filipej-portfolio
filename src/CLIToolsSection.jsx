@@ -1,8 +1,9 @@
 // CLIToolsSection.jsx
-// Import React, motion, Section, and Lucide icons.
+// Import React, motion, Section, UI components, and Lucide icons.
 import React from "react";
 import { motion } from "framer-motion";
 import Section from "./Section";
+import { Card, Button, Tag, TextPrimary, TextSecondary, CodeBlock, Link, focusRing } from "./components/UI";
 import { Terminal, FileCode, BarChart3, Zap, Github } from "lucide-react";
 
 /**
@@ -198,26 +199,32 @@ const CLIToolsSection = () => {
 
   return (
     <Section title="CLI Tools & Scripts" icon={Terminal} id="cli">
-      <p className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed">
+      <TextSecondary 
+        as="p" 
+        className="text-center text-base md:text-lg mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed"
+      >
         Crafting efficient command-line interfaces to accelerate research and
         automate complex tasks in nanoscience and data analysis. These tools are
         designed for robustness and ease of use.
-      </p>
+      </TextSecondary>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
         {cliToolsData.map((tool, index) => {
           const ToolIcon = tool.icon;
           return (
-            <motion.article
+            <motion.div
               key={tool.id}
-              className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col cursor-default"
               variants={cardVariants}
               initial="hidden"
               whileInView="visible"
               whileHover="hover"
               viewport={{ once: true, amount: 0.1 }}
               custom={index}
-              aria-labelledby={`cli-tool-title-${tool.id}`}
             >
+              <Card 
+                className="h-full flex flex-col cursor-default border dark:border-slate-700 transition-all duration-300"
+                as="article"
+                aria-labelledby={`cli-tool-title-${tool.id}`}
+              >
               <div className="flex items-center text-emerald-600 dark:text-emerald-400 mb-4">
                 <ToolIcon
                   className="h-9 w-9 mr-3.5 stroke-[1.75] flex-shrink-0"
@@ -230,9 +237,9 @@ const CLIToolsSection = () => {
                   {tool.title}
                 </h3>
               </div>
-              <p className="text-gray-700 dark:text-slate-300 text-sm mb-3 leading-relaxed">
+              <TextSecondary as="p" className="text-sm mb-3 leading-relaxed">
                 {tool.description}
-              </p>
+              </TextSecondary>
               {tool.problemSolved && (
                 <p className="text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4">
                   <span className="font-semibold">Impact: </span>
@@ -241,35 +248,37 @@ const CLIToolsSection = () => {
               )}
               <div className="mb-5 flex flex-wrap gap-2">
                 {tool.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs bg-emerald-100 dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 px-3 py-1 rounded-full font-medium"
-                  >
+                  <Tag key={tag} variant="default">
                     {tag}
-                  </span>
+                  </Tag>
                 ))}
               </div>
               {tool.codeExample && (
-                <div className="bg-gray-800 dark:bg-slate-900/80 p-4 rounded-lg font-mono text-xs mb-5 overflow-x-auto shadow-inner">
-                  <pre className="whitespace-pre-wrap leading-relaxed text-sm">
-                    {tool.codeExample}
-                  </pre>
-                </div>
+                <CodeBlock className="mb-5">
+                  {tool.codeExample}
+                </CodeBlock>
               )}
-              <motion.a
-                href={tool.githubLink || "https://github.com/filipejunqueira"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-500 dark:bg-emerald-600 text-white font-medium py-2.5 px-5 rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-700 transition-colors duration-300 shadow-sm hover:shadow-md text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 dark:focus:ring-emerald-500 focus:ring-offset-white dark:focus:ring-offset-slate-800"
+              <motion.div
+                className="mt-auto"
                 whileHover={{
                   scale: 1.03,
                   transition: { type: "spring", stiffness: 300, damping: 10 },
                 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <Github size={18} aria-hidden="true" /> View on GitHub
-              </motion.a>
-            </motion.article>
+                <Button
+                  as="a"
+                  href={tool.githubLink || "https://github.com/filipejunqueira"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="primary"
+                  className="w-full gap-2 text-sm uppercase tracking-wider shadow-sm hover:shadow-md"
+                >
+                  <Github size={18} aria-hidden="true" /> View on GitHub
+                </Button>
+              </motion.div>
+              </Card>
+            </motion.div>
           );
         })}
       </div>

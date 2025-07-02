@@ -2,6 +2,10 @@
 // Import React and motion from framer-motion.
 import React from "react";
 import { motion } from "framer-motion";
+// Import centralized animations
+import { subtleHover } from "./animations";
+// Import UI components
+import { TextPrimary, TextMuted } from "./components/UI";
 
 /**
  * SkillItem Component: Renders a single skill item.
@@ -13,7 +17,7 @@ import { motion } from "framer-motion";
 const SkillItem = ({ name, icon: Icon, proficiency }) => (
   <motion.li
     className="bg-emerald-50 dark:bg-slate-700/50 p-3 rounded-lg shadow-sm flex items-center space-x-3 hover:shadow-md transition-shadow"
-    whileHover={{ y: -3 }} // Subtle lift animation on hover.
+    whileHover={subtleHover} // Subtle lift animation on hover.
   >
     {Icon && (
       <Icon
@@ -22,13 +26,13 @@ const SkillItem = ({ name, icon: Icon, proficiency }) => (
         aria-hidden="true"
       />
     )}
-    <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
+    <TextPrimary className="text-sm font-medium">
       {name}
-    </span>
+    </TextPrimary>
     {proficiency && (
-      <span className="text-xs text-gray-500 dark:text-slate-400 ml-auto">
+      <TextMuted className="text-xs ml-auto">
         ({proficiency})
-      </span>
+      </TextMuted>
     )}
   </motion.li>
 );

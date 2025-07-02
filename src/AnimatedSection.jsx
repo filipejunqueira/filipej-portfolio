@@ -1,18 +1,11 @@
 // AnimatedSection.jsx
-// Import React and necessary hooks from the 'react' library.
-import React, { useEffect } from "react";
-// Import animation utilities from 'framer-motion'.
-import { motion, useAnimation } from "framer-motion";
-// Import 'useInView' hook from 'react-intersection-observer'.
-import { useInView } from "react-intersection-observer";
+// Import React and animation utilities.
+import React from "react";
+import { motion } from "framer-motion";
 
-// Default animation variants for Framer Motion.
-// 'hidden': Initial state (opacity 0, slightly offset on Y-axis).
-// 'visible': Target state (opacity 1, original Y position).
-const defaultVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
+// Import centralized animation variants and custom hook
+import { defaultVariants } from "./animations";
+import { useScrollAnimation } from "./hooks/useScrollAnimation";
 
 /**
  * AnimatedSection Component: Wraps children in a motion.div for scroll-triggered animations.
@@ -36,28 +29,12 @@ const AnimatedSection = ({
   reduceMotion = false,
   ariaLabel,
 }) => {
-  // `useAnimation` hook from Framer Motion to programmatically control animations.
-  const controls = useAnimation();
-  // `useInView` hook to track if the component is visible in the viewport.
-  // `triggerOnce: true` ensures the animation only runs once.
-  // `threshold` determines how much of the element must be visible to trigger.
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
-
-  // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined' && 
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // `useEffect` hook to start the animation when the component comes into view.
-  useEffect(() => {
-    if (inView) {
-      if (prefersReducedMotion || reduceMotion) {
-        // Skip animation, just show content
-        controls.start({ opacity: 1, x: 0, y: 0 });
-      } else {
-        controls.start("visible"); // Start the 'visible' animation variant.
-      }
-    }
-  }, [controls, inView, prefersReducedMotion, reduceMotion]); // Dependencies: re-run effect if 'controls' or 'inView' changes.
+  // Use our optimized scroll animation hook
+  const { ref, controls, prefersReducedMotion } = useScrollAnimation({
+    threshold,
+    delay,
+    reduceMotion,
+  });
 
   return (
     // `motion.div` is a Framer Motion component that enables animations on a div.

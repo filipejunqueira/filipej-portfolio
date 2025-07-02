@@ -4,6 +4,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import Section from "./Section";
 import { Presentation, ExternalLink } from "lucide-react";
+// Import centralized animations
+import { defaultVariants, fadeInFromLeft } from "./animations";
 
 /**
  * TeachingSection Component: Details teaching and tutoring experience.
@@ -22,8 +24,9 @@ const TeachingSection = () => {
       <div className="max-w-3xl mx-auto space-y-6">
         <motion.p
           className="text-center text-base md:text-lg text-gray-700 dark:text-slate-300 leading-relaxed"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          animate="visible"
+          variants={defaultVariants}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           Beyond my research and creative projects, I am deeply committed to
@@ -36,8 +39,9 @@ const TeachingSection = () => {
           {teachingPoints.map((point, index) => (
             <motion.li
               key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInFromLeft}
               transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
               className="ml-4"
             >
@@ -48,8 +52,9 @@ const TeachingSection = () => {
 
         <motion.div
           className="text-center mt-8"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          animate="visible"
+          variants={defaultVariants}
           transition={{
             duration: 0.5,
             delay: 0.3 + teachingPoints.length * 0.1,

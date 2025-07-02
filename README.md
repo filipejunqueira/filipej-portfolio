@@ -7,7 +7,7 @@ This repository contains the source code for **[filipej.dev](https://filipej.dev
 - **React + Vite** for a fast development workflow
 - **Tailwind CSS** for styling and responsive layouts
 - **Framer Motion** animations
-- Dark mode toggle with the preference stored in `localStorage` and optionally in Firestore
+- Dark mode toggle with the preference stored in `localStorage`
 - Sections for skills, teaching, career & education, publications, Blender art, command line tools and contact details
 
 ## Local development
@@ -31,18 +31,6 @@ This repository contains the source code for **[filipej.dev](https://filipej.dev
 
 The resulting static files will be generated in the `dist/` directory.
 
-### Firebase configuration
-
-The site can optionally save user preferences to Firebase. When deploying you may expose two global variables before loading the application:
-
-```html
-<script>
-  window.__firebase_config = { /* your firebase config */ };
-  window.__app_id = 'my-portfolio';
-</script>
-```
-
-If no Firebase configuration is provided, dark mode will still work using `localStorage` only.
 
 ## License
 

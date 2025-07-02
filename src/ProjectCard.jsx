@@ -12,8 +12,10 @@ import {
   ArrowRightCircle,
   ExternalLink,
 } from "lucide-react";
-// Import OptimizedImage component
-import OptimizedImage from "./OptimizedImage";
+// Import LazyImage component for dynamic loading
+import LazyImage from "./LazyImage";
+// Import UI components for consistency
+import { Article, Button, IconButton, Link, TextPrimary, TextSecondary, focusRing } from "./components/UI";
 
 /**
  * ProjectCard Component: Displays details for a single project.
@@ -21,8 +23,8 @@ import OptimizedImage from "./OptimizedImage";
  * @param {string} props.title - Project title.
  * @param {string} props.description - Project description.
  * @param {string} [props.artisticStatement] - Optional artistic statement.
- * @param {string} props.mainImage - URL for the main project image.
- * @param {string[]} props.galleryImages - Array of URLs for gallery images.
+ * @param {string} props.mainImage - Name of the main project image.
+ * @param {string[]} props.galleryImages - Array of image names for gallery images.
  * @param {string} [props.imagePlaceholderColor] - Background for image placeholder.
  * @param {string} [props.link] - Optional external link.
  * @param {string} props.type - Type of project (e.g., "blender", "code").
@@ -80,16 +82,17 @@ const ProjectCard = ({
   };
 
   return (
-    <article className="bg-emerald-50 dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl dark:shadow-slate-700/60 dark:hover:shadow-slate-600/70 dark:border dark:border-slate-700 transition-all duration-300 flex flex-col h-full">
+    <Article>
       {type === "blender" && mainImage ? (
         <div className="overflow-hidden rounded-md mb-5 shadow-sm">
-          <OptimizedImage
-            src={mainImage}
+          <LazyImage
+            imageName={mainImage}
             alt={`Main image for ${title} - ${type} project`}
             className="w-full h-52 md:h-60 object-cover transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
             onError={imageErrorHandler}
-            onClick={() => onImageClick(mainImage)}
+            onClick={onImageClick}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={true}
           />
         </div>
       ) : (
@@ -106,16 +109,20 @@ const ProjectCard = ({
         </div>
       )}
 
-      <h3 className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300 mb-3">
+      <TextPrimary 
+        as="h3" 
+        className="text-xl md:text-2xl font-medium text-emerald-800 dark:text-emerald-300 mb-3"
+      >
         {title}
-      </h3>
+      </TextPrimary>
 
       <div className="flex-grow">
-        <p
-          className={`text-gray-700 dark:text-slate-300 text-sm md:text-base mb-2 ${isDescriptionExpanded || !artisticStatement ? "" : "line-clamp-3"}`}
+        <TextSecondary 
+          as="p"
+          className={`text-sm md:text-base mb-2 ${isDescriptionExpanded || !artisticStatement ? "" : "line-clamp-3"}`}
         >
           {description}
-        </p>
+        </TextSecondary>
         {artisticStatement && (
           <p
             className={`text-emerald-700/80 dark:text-emerald-400/80 text-xs italic mt-1 mb-4 ${isDescriptionExpanded ? "" : "line-clamp-2"}`}
@@ -127,9 +134,11 @@ const ProjectCard = ({
 
       {(description.length > 100 ||
         (artisticStatement && artisticStatement.length > 50)) && (
-        <button
+        <Button
           onClick={toggleDescription}
-          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center mb-4 text-sm font-medium self-start uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+          variant="outline"
+          size="sm"
+          className="mb-4 self-start"
           aria-expanded={isDescriptionExpanded}
         >
           {isDescriptionExpanded ? "Show Less" : "Show More"}
@@ -138,20 +147,20 @@ const ProjectCard = ({
           ) : (
             <ChevronDown size={18} className="ml-1" aria-hidden="true" />
           )}
-        </button>
+        </Button>
       )}
 
       <div className="mt-auto">
         {/* The "View/Hide Images" button has been REMOVED from here */}
         {link && (
-          <a
+          <Link
             href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium transition-colors duration-300 self-start text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:ring-offset-emerald-50 dark:focus:ring-offset-slate-800 rounded-sm"
+            external={true}
+            variant="button"
+            className="self-start"
           >
             View Project <ExternalLink size={16} className="ml-1.5" />
-          </a>
+          </Link>
         )}
       </div>
 
@@ -166,42 +175,45 @@ const ProjectCard = ({
           >
             <div className="relative mb-2">
               <div className="overflow-hidden rounded-md">
-                <OptimizedImage
-                  src={galleryImages[currentImageIndex]}
+                <LazyImage
+                  imageName={galleryImages[currentImageIndex]}
                   alt={`${title} - Gallery Image ${currentImageIndex + 1} of ${galleryImages.length}`}
                   className="w-full h-60 md:h-72 object-cover shadow-inner bg-gray-100 dark:bg-slate-700 transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer"
                   onError={imageErrorHandler}
-                  onClick={() => onImageClick(galleryImages[currentImageIndex])}
+                  onClick={onImageClick}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  shouldLoad={isGalleryOpen}
                 />
               </div>
               {galleryImages.length > 1 && (
                 <>
-                  <button
+                  <IconButton
                     onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-black/50 focus:ring-white"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-opacity"
                     aria-label="Previous Image"
-                  >
-                    <ArrowLeftCircle size={22} aria-hidden="true" />
-                  </button>
-                  <button
+                    icon={ArrowLeftCircle}
+                  />
+                  <IconButton
                     onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-black/50 focus:ring-white"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-opacity"
                     aria-label="Next Image"
-                  >
-                    <ArrowRightCircle size={22} aria-hidden="true" />
-                  </button>
+                    icon={ArrowRightCircle}
+                  />
                 </>
               )}
             </div>
             {galleryImages.length > 1 && (
-              <p className="text-center text-xs text-gray-600 dark:text-slate-400">
+              <TextSecondary as="p" className="text-center text-xs">
                 Image {currentImageIndex + 1} of {galleryImages.length}
-              </p>
+              </TextSecondary>
             )}
           </div>
         )}
-    </article>
+    </Article>
   );
 };
 

@@ -32,7 +32,7 @@ const HeroSection = () => (
         <OptimizedImage
           src={profilePic}
           webpSrc={profilePicWebP}
-          alt="Filipe L. Q. Junqueira - Main Profile Picture"
+          alt="Filipe L. Q. Junqueira - Main Section"
           className="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl border-4 border-white/80 dark:border-slate-400/50"
           priority={true}
           sizes="(max-width: 768px) 144px, 176px"

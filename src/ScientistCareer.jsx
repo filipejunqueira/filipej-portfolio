@@ -185,13 +185,13 @@ const ScientistCareer = () => {
                     >
                       {milestone.role}
                     </TextPrimary>
-                    <TextPrimary className="text-base text-emerald-700 dark:text-emerald-400 font-normal mt-1">
+                    <TextPrimary as="div" className="text-base text-emerald-700 dark:text-emerald-400 font-normal mt-1">
                       {milestone.institution}
                     </TextPrimary>
-                    <TextMuted className="text-sm mb-2 mt-0.5">
+                    <TextMuted as="div" className="text-sm mb-2 mt-0.5">
                       {milestone.duration}
                     </TextMuted>
-                    <TextSecondary className="leading-relaxed text-base">
+                    <TextSecondary as="div" className="leading-relaxed text-base">
                       {milestone.description}
                     </TextSecondary>
                     {milestone.moreDetails && (

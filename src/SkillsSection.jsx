@@ -17,6 +17,7 @@ import {
   Globe,
   MessageSquare,
   Lightbulb,
+  BrainCog,
 } from "lucide-react";
 
 /**
@@ -31,8 +32,8 @@ const SkillsSection = () => {
       { name: "Fortran", icon: Code },
       { name: "Lua", icon: Code },
       { name: "Bash/Shell Scripting", icon: Terminal },
-      { name: "JavaScript (React, Node.js)", icon: Code },
-      { name: "C++(Basic)", icon: Code },
+      { name: "JavaScript/Typescript (React, Node.js) (Basic) ", icon: Code },
+      { name: "C++ (Basic)", icon: Code },
       { name: "Tailwind CSS", icon: Code },
       { name: "Git & GitHub", icon: Github },
       { name: "SQL", icon: HardDrive },
@@ -44,6 +45,10 @@ const SkillsSection = () => {
       { name: "SPM (AFM/STM) Analysis", icon: BarChart3 },
       { name: "Pymatgen", icon: FileCode },
       { name: "ASE (Atomic Simulation Environment)", icon: Atom },
+      {
+        name: "Prompt/Context 'Engineering', Antropic Claude Code, ChatGPT Codex, Gemini CLI",
+        icon: BrainCog,
+      },
       {
         name: "Machine Learning (Scikit-learn, TensorFlow/Keras Basics, PyTorch Basics)",
         icon: Brain,
